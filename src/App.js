@@ -1,184 +1,172 @@
+// src/App.js
+
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import libraryData from "./mockData/library"; // A big library array you showed
+import libraryData from "./mockData/library";
 
-const pastelColors = ["#d9f0ff", "#e3d9ff", "#d9ffec", "#ffe7d9", "#ffe5fa"];
+function containsItem(root, targetId) {
+  if (root.id === targetId) return true;
+  if (!root.children) return false;
+  for (const child of root.children) {
+    if (containsItem(child, targetId)) return true;
+  }
+  return false;
+}
+
+const pastelColors = ["#d9f0ff", "#e3d9ff", "#d9ffec", "#ffe7d9", "#ffe5fa", "#fff4d9"];
+
+function renderBlock(item, level, onDropChild) {
+  const bg = pastelColors[Math.min(level, pastelColors.length - 1)];
+
+  return (
+    <div
+      key={item.id}
+      className="block"
+      style={{ backgroundColor: bg, marginLeft: `${level * 24}px` }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.currentTarget.classList.add("drag-over");
+      }}
+      onDragLeave={(e) => {
+        e.currentTarget.classList.remove("drag-over");
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.currentTarget.classList.remove("drag-over");
+        onDropChild(e, item);
+      }}
+    >
+      <strong>{item.label}</strong>
+      <br />
+      <em style={{ fontSize: "0.85rem" }}>{item.text}</em>
+      <div style={{ fontSize: "0.7rem", color: "#888" }}>({item.type})</div>
+      {Array.isArray(item.children) && item.children.length > 0 && (
+        <div className="nested-blocks">
+          {item.children.map((child) => renderBlock(child, level + 1, onDropChild))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function App() {
-  // In-memory library (like jokes/bits/sets) from library.js
   const [library, setLibrary] = useState([]);
-  
-  // A local state for newly created items, so we can drag them around
-  const [newMaterial, setNewMaterial] = useState([]);
-  const [newMaterialName, setNewMaterialName] = useState("");
-
-  // The single item we are focusing on
-  const [focusItem, setFocusItem] = useState(null);
-
-  // The current tab in the middle panel (builder, analysis, etc.)
-  const [activeTab, setActiveTab] = useState("builder");
-
-  // The library category we are showing on the left (idea, joke, bit, set, special)
   const [activeLibCategory, setActiveLibCategory] = useState("joke");
-  
-  // Load from libraryData once
+  const [focusItem, setFocusItem] = useState(null);
+  const [activeTab, setActiveTab] = useState("builder");
+  const [newItemName, setNewItemName] = useState("");
+
   useEffect(() => {
-    setLibrary(libraryData);
+    const saved = localStorage.getItem("comedyFocusItem");
+    if (saved) {
+      setFocusItem(JSON.parse(saved));
+    }
+    const savedLibrary = localStorage.getItem("comedyLibrary");
+    if (savedLibrary) {
+      setLibrary(JSON.parse(savedLibrary));
+    } else {
+      setLibrary(libraryData);
+    }
   }, []);
 
-  // The categories we want to display in the left library panel
-  const libCategories = ["idea", "joke", "bit", "set", "special"];
+  useEffect(() => {
+    if (focusItem) {
+      localStorage.setItem("comedyFocusItem", JSON.stringify(focusItem));
+      // Update library with modified focus item
+      setLibrary((prevLib) => {
+        const updated = prevLib.map((item) => (item.id === focusItem.id ? focusItem : item));
+        localStorage.setItem("comedyLibrary", JSON.stringify(updated));
+        return updated;
+      });
+    }
+  }, [focusItem]);
 
-  // DRAG HANDLERS
-  const handleDragStart = (e, item) => {
+  function handleDragStart(e, item) {
     e.dataTransfer.setData("application/json", JSON.stringify(item));
-  };
-
-  const handleDragOver = (e) => {
+  }
+  function handleFocusDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove("drag-over");
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+    if (focusItem && focusItem.id === data.id) return;
+    setFocusItem(structuredClone(data));
+  }
+  function allowDrop(e) {
     e.preventDefault();
     e.currentTarget.classList.add("drag-over");
-  };
-
-  const handleDragLeave = (e) => {
+  }
+  function handleDragLeave(e) {
     e.currentTarget.classList.remove("drag-over");
-  };
-
-  // When dropping onto the Focus bar
-  const handleFocusDrop = (e) => {
+  }
+  function handleDropIntoChild(e, parent) {
     e.preventDefault();
     e.currentTarget.classList.remove("drag-over");
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
-    
-    // If we already are focusing on this same item, skip
-    if (focusItem && focusItem.id === data.id) return;
-    
-    // If there's a new item, copy it to focus
-    setFocusItem(structuredClone(data));
-  };
-
-  // Pastel color for nesting levels
-  const getPastelColor = (level) => {
-    return pastelColors[Math.min(level, pastelColors.length - 1)];
-  };
-
-  // RENDER RECURSIVE BLOCK
-  const renderBlock = (item, level = 0) => {
-    const bgColor = getPastelColor(level);
-
-    return (
-      <div
-        key={item.id || Math.random()}
-        className="block"
-        style={{ backgroundColor: bgColor, marginLeft: `${level * 24}px` }}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={(e) => handleDropInsideItem(e, item)}
-      >
-        <strong>{item.label}</strong> <br />
-        <em>{item.text}</em>
-
-        {Array.isArray(item.children) && item.children.length > 0 && (
-          <div className="nested-blocks">
-            {item.children.map((child) => renderBlock(child, level + 1))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Dropping *inside* an item that has children
-  const handleDropInsideItem = (e, parentItem) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove("drag-over");
-    const data = JSON.parse(e.dataTransfer.getData("application/json"));
-
-    // If this item or any nested child has the same ID, skip (avoid duplicates).
-    if (containsItem(parentItem, data.id)) {
-      return;
-    }
-
-    // Ensure parentItem has children
-    if (!parentItem.children) {
-      // Only certain types can have children
-      if (["bit", "set", "special"].includes(parentItem.type)) {
-        parentItem.children = [];
-      } else {
-        // If it's a joke or idea, maybe we do nothing or add anyway?
-        // Let's do nothing to be safe
-        return;
-      }
-    }
-
-    parentItem.children.push(structuredClone(data));
-    // re-render
+    if (!parent.children) parent.children = [];
+    if (containsItem(parent, data.id)) return;
+    parent.children.push(structuredClone(data));
     setFocusItem({ ...focusItem });
-  };
+  }
 
-  // HELPER: see if some item already includes that ID in its subtree
-  const containsItem = (root, targetId) => {
-    if (root.id === targetId) return true;
-    if (!root.children) return false;
-    for (const child of root.children) {
-      if (containsItem(child, targetId)) return true;
-    }
-    return false;
-  };
-
-  // BUILDER TAB => show the focused item if it can nest children
-  const renderBuilder = () => {
+  function renderBuilderTab() {
     if (!focusItem) {
-      return <div className="tool-desc">No item is focused. Drag/click a library item to Focus.</div>;
+      return <div className="tool-desc">No item in focus. Drag/click from library to focus.</div>;
     }
-    // If it's a bit, set, or special, let's ensure it has children array
-    if (["bit","set","special"].includes(focusItem.type) && !focusItem.children) {
+    if (["bit", "set", "special"].includes(focusItem.type) && !focusItem.children) {
       focusItem.children = [];
     }
-    // Render the item itself in nested form
     return (
       <div
         className="builder-area drop-zone"
-        onDragOver={handleDragOver}
+        onDragOver={allowDrop}
         onDragLeave={handleDragLeave}
-        onDrop={(e)=>{
+        onDrop={(e) => {
           e.preventDefault();
           e.currentTarget.classList.remove("drag-over");
           const data = JSON.parse(e.dataTransfer.getData("application/json"));
-          
-          // If this item or any nested child has the same ID, skip duplicates
-          if (containsItem(focusItem, data.id)) {
-            return;
-          }
-
-          if (!focusItem.children && ["bit","set","special"].includes(focusItem.type)) {
-            focusItem.children = [];
-          }
-          if (focusItem.children) {
-            focusItem.children.push(structuredClone(data));
-          }
+          if (!focusItem.children) focusItem.children = [];
+          if (containsItem(focusItem, data.id)) return;
+          focusItem.children.push(structuredClone(data));
           setFocusItem({ ...focusItem });
         }}
       >
-        {renderBlock(focusItem, 0)}
+        {renderBlock(focusItem, 0, handleDropIntoChild)}
       </div>
     );
+  }
+
+  function renderTextTab() {
+    if (!focusItem) return <div className="tool-desc">No focus item. Drag/click from library.</div>;
+    let lines = [];
+    function printItem(it, depth = 0) {
+      const prefix = "  ".repeat(depth);
+      lines.push(prefix + (it.text || it.label));
+      if (it.children && it.children.length > 0) {
+        for (const c of it.children) {
+          printItem(c, depth + 1);
+        }
+      }
+    }
+    printItem(focusItem, 0);
+    return <pre style={{ padding: "8px", background: "#f9f9f9", borderRadius: 4 }}>{lines.join("\n")}</pre>;
+  }
+
+  const categories = ["idea", "joke", "bit", "set", "special"];
+  const filteredLib = library.filter((item) => item.type === activeLibCategory);
+
+  const tabContentMap = {
+    builder: renderBuilderTab(),
+    text: renderTextTab(),
+    versions: <div className="tool-desc">Versions for {focusItem?.label}</div>,
+    tags: <div className="tool-desc">Tags for {focusItem?.label}</div>
   };
 
-  // TABS
-  const toolTabs = {
-    builder: renderBuilder(),
-    analysis: <div className="tool-desc">Analysis Tools for {focusItem?.label}</div>,
-    versions: <div className="tool-desc">Versions or Past Recordings for {focusItem?.label}</div>,
-    tags: <div className="tool-desc">Tag Suggestions for {focusItem?.label}</div>
-  };
-
-  // RENDER
   return (
     <div className="layout">
-      {/* LEFT: Library Panel */}
       <div className="left-panel">
         <h2 className="panel-header">📚 Library</h2>
         <div className="tab-buttons">
-          {libCategories.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat}
               className={cat === activeLibCategory ? "active" : ""}
@@ -189,28 +177,25 @@ export default function App() {
           ))}
         </div>
         <div className="tabs">
-          {library
-            .filter((x) => x.type === activeLibCategory)
-            .map((item) => (
-              <div
-                key={item.id}
-                className="tab"
-                draggable
-                onDragStart={(e) => handleDragStart(e, item)}
-                onClick={() => setFocusItem(structuredClone(item))}
-              >
-                {item.label || item.text}
-              </div>
-            ))}
+          {filteredLib.map((item) => (
+            <div
+              key={item.id}
+              className="tab"
+              draggable
+              style={{ cursor: "grab" }}
+              onDragStart={(e) => handleDragStart(e, item)}
+              onClick={() => setFocusItem(structuredClone(item))}
+            >
+              {item.label || item.text}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Middle Panel */}
       <div className="middle-panel">
-        {/* FOCUS BAR */}
         <div
           className="focus-bar drop-zone"
-          onDragOver={handleDragOver}
+          onDragOver={allowDrop}
           onDragLeave={handleDragLeave}
           onDrop={handleFocusDrop}
         >
@@ -222,70 +207,66 @@ export default function App() {
               draggable
               onDragStart={(e) => handleDragStart(e, focusItem)}
             >
-              <strong>{focusItem.label}</strong> <br/>
-              <em>{focusItem.text}</em>
+              <strong>{focusItem.label}</strong>
+              <br />
+              <em style={{ fontSize: "0.85rem" }}>{focusItem.text}</em>
+              <div style={{ fontSize: "0.7rem", color: "#777" }}>({focusItem.type})</div>
             </div>
           ) : (
-            <div className="focus-placeholder">Drag or click something to focus</div>
+            <div className="focus-placeholder">Drag/click something here to focus</div>
           )}
         </div>
 
-        {/* Tool Tabs (Builder, Analysis, Versions, Tags) */}
         <div className="middle-panel-tools">
           <div className="tab-buttons">
-            {Object.keys(toolTabs).map((key) => (
+            {Object.keys(tabContentMap).map((tabKey) => (
               <button
-                key={key}
-                className={activeTab === key ? "active" : ""}
-                onClick={() => setActiveTab(key)}
+                key={tabKey}
+                className={tabKey === activeTab ? "active" : ""}
+                onClick={() => setActiveTab(tabKey)}
               >
-                {key.charAt(0).toUpperCase() + key.slice(1)}
+                {tabKey}
               </button>
             ))}
           </div>
-          <div className="tab-content">{toolTabs[activeTab]}</div>
+          <div className="tab-content" style={{ overflow: "auto", flex: "1" }}>
+            {tabContentMap[activeTab]}
+          </div>
         </div>
       </div>
 
-      {/* RIGHT: New Material */}
       <div className="right-panel">
         <h2 className="panel-header">New Material</h2>
-        <p>Drag from here or create new items</p>
-        {newMaterial.map((nm, i) => (
-          <div
-            key={nm.type + nm.text + i}
-            className="tab block"
-            draggable
-            onDragStart={(e) => handleDragStart(e, nm)}
-            onClick={() => setFocusItem(structuredClone(nm))}
-          >
-            {nm.type === "segue" ? <em>{nm.text}</em> : nm.text}
-          </div>
-        ))}
-        <div style={{ margin: "1rem 0" }}>
+        <div className="input-section" style={{ marginBottom: "8px" }}>
+          <button>Text</button>
+          <button>Record</button>
+          <button>Upload</button>
+          <button>Organize</button>
+        </div>
+        <div>
           <input
             placeholder="New item name"
-            value={newMaterialName}
-            onChange={(e) => setNewMaterialName(e.target.value)}
+            value={newItemName}
+            onChange={(e) => setNewItemName(e.target.value)}
+            style={{ marginBottom: "4px", padding: "4px" }}
           />
           <button
             onClick={() => {
-              if (!newMaterialName.trim()) return;
-              const newItem = {
+              if (!newItemName.trim()) return;
+              const newObj = {
                 id: Math.random().toString(36).slice(2),
                 type: "joke",
-                label: newMaterialName,
-                text: newMaterialName
+                label: newItemName,
+                text: newItemName
               };
-              setNewMaterial([...newMaterial, newItem]);
-              setNewMaterialName("");
+              setLibrary([...library, newObj]);
+              setNewItemName("");
             }}
           >
-            Add
+            + Add
           </button>
         </div>
       </div>
     </div>
   );
 }
-

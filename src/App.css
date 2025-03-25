@@ -1,141 +1,136 @@
+/* App.css */
+
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #f9f9f9;
+  font-family: sans-serif;
+  background: #fafafa;
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  display: flex;
   height: 100vh;
 }
 
-.panel-header {
-  margin: 10px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border-bottom: 2px solid #ccc;
-  padding-bottom: 4px;
-}
-
-.left-panel,
-.middle-panel,
-.right-panel {
-  padding: 10px;
-  overflow-y: auto;
-  border-right: 1px solid #ddd;
-  background: white;
-}
-
+/* Left Panel */
 .left-panel {
-  background: #fcfcfc;
-}
-
-.tabs .tab {
+  width: 240px;
+  border-right: 1px solid #ccc;
   padding: 8px;
-  margin-bottom: 4px;
-  background: #eef;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
+  overflow-y: auto;
+  background: #ffffff;
 }
 
-.tabs .tab:hover {
-  background: #dde;
-}
-
-.library-note {
-  margin-top: 1em;
-  font-style: italic;
-  font-size: 0.9em;
-  color: #777;
-}
-
-.input-section {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.input-section input {
-  flex: 1;
-  padding: 6px 10px;
-  border: 1px solid #aaa;
-  border-radius: 6px;
-}
-
-.input-section button {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #eee;
-}
-
-.save-btn {
-  margin-top: 10px;
-  padding: 8px 12px;
-  background: #b2f2bb;
-  border: 1px solid #6ec36e;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.new-list .block,
-.focused-area .block {
-  padding: 6px 10px;
-  margin-bottom: 6px;
-  border-radius: 5px;
-  background: #f0f0f0;
-}
-
-.block-joke {
-  background: #fff3cd;
-}
-
-.block-bit {
-  background: #d1ecf1;
-}
-
-.block-set {
-  background: #e2e3e5;
-}
-
-.block-idea {
-  background: #f8d7da;
-}
-
-.block-segue {
-  background: #e8e8ff;
-  font-style: italic;
-}
-
-.middle-panel-tools {
-  margin-top: 20px;
+.panel-header {
+  margin-top: 0;
+  margin-bottom: 8px;
 }
 
 .tab-buttons {
   display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 4px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .tab-buttons button {
-  padding: 6px 10px;
-  border: none;
-  background: #ddd;
-  border-radius: 5px;
+  padding: 4px 8px;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.tab-buttons button.active {
-  background: #bbb;
-  font-weight: bold;
+.tab-buttons .active {
+  background: #666;
+  color: white;
+  border-color: #666;
+}
+
+/* Middle Panel */
+.middle-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.focus-bar {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+  background: #fdfdfd;
+  min-height: 90px;
+}
+
+.focus-placeholder {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+.block {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  padding: 6px 8px;
+  cursor: grab;
+}
+
+.drop-zone.drag-over {
+  border: 2px dashed #4285f4 !important;
+}
+
+.middle-panel-tools {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.middle-panel-tools .tab-buttons {
+  border-bottom: 1px solid #ccc;
+  padding: 4px 8px;
+}
+
+.tab-content {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
 }
 
 .tool-desc {
-  padding: 10px;
-  background: #f3f3f3;
-  border-radius: 6px;
+  padding: 12px;
+  background: #fff;
+  border: 1px dashed #aaa;
+  border-radius: 4px;
+}
+
+/* Right Panel */
+.right-panel {
+  width: 240px;
+  border-left: 1px solid #ccc;
+  padding: 8px;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.input-section {
+  margin-bottom: 8px;
+}
+
+.input-section button {
+  margin-right: 4px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  background: #eee;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.nested-blocks {
+  margin-top: 4px;
+  margin-left: 8px;
+}
+
+/* For drag highlight */
+.drag-over {
+  background: #e8f0fe !important;
 }
