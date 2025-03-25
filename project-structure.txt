@@ -1,0 +1,17 @@
+# Project Structure: utils
+# Generated on: 03/25/2025 00:25:07
+
+|   +-- App.css
+|   +-- App.js
+|   +-- App.test.js
+|   +-- index.css
+|   +-- index.js
+|   +-- logo.svg
+|   +-- reportWebVitals.js
+|   +-- setupTests.js
++-- .gitignore
++-- package.json
++-- project-status-script.ps1
++-- project-structure.txt
++-- README.md
++-- setup-script.ps1
