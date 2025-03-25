@@ -1,4 +1,3 @@
-// Create a new BlockComponent.jsx file
 import React, { useState } from 'react';
 
 const pastelColors = ["#d9f0ff", "#e3d9ff", "#d9ffec", "#ffe7d9", "#ffe5fa", "#fff4d9"];
@@ -6,6 +5,22 @@ const pastelColors = ["#d9f0ff", "#e3d9ff", "#d9ffec", "#ffe7d9", "#ffe5fa", "#f
 const BlockComponent = ({ item, level, onDropChild, onRemoveChild, onDragStart, parent }) => {
   const [insertPosition, setInsertPosition] = useState(null);
   const bg = pastelColors[Math.min(level, pastelColors.length - 1)];
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const isTopHalf = e.clientY - rect.top < rect.height / 3;
+        const isBottomHalf = e.clientY - rect.top > rect.height * 2/3;
+        
+        setInsertPosition(
+        isTopHalf ? 'before' : 
+        isBottomHalf ? 'after' : 'nest'
+        );
+    };
+  
+  // Update render output
+  {insertPosition === 'before' && <div className="insert-indicator before" />}
+  {insertPosition === 'nest' && <div className="insert-indicator nest" />}
+  {insertPosition === 'after' && <div className="insert-indicator after" />}
 
   return (
     <div
@@ -25,7 +40,8 @@ const BlockComponent = ({ item, level, onDropChild, onRemoveChild, onDragStart, 
         style={{ 
           backgroundColor: bg, 
           marginLeft: `${level * 24}px`,
-          cursor: 'grab'
+          cursor: 'grab',
+          minWidth: '300px'
         }}
         draggable
         onDragStart={(e) => onDragStart(e, item)}

@@ -1,56 +1,94 @@
-/* App.css */
+:root {
+  --primary: #3b82f6;
+  --background: #fce4ec; /* A nice pastel pink */
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .layout {
   display: flex;
   height: 100vh;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: #f5f7fa;
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--background);
 }
 
 .left-panel, .right-panel {
-  width: 320px;
+  width: 400px;
   padding: 1.5rem;
-  background: #ffffff;
-  border-right: 1px solid #e3e8ef;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
   overflow-y: auto;
 }
 
 .middle-panel {
   flex: 1;
-  min-width: 600px;
-  background: #f8fafc;
+  min-width: 500px;
+  padding: 2rem;
+  background: var(--background);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 1.5rem;
+  gap: 2rem;
 }
 
-/* Block Styling */
+.block-container {
+  position: relative;
+}
+
+.insert-indicator {
+  height: 2px;
+  background: var(--primary);
+  margin: 4px 24px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.block-container.drag-over .insert-indicator {
+  opacity: 1;
+}
+
 .block {
-  padding: 1.25rem;
+  padding: 1.5rem;
   margin: 0.5rem 0;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(15,23,42,0.03);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
 }
 
 .block:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px -2px rgba(15,23,42,0.1);
-}
-
-.block.drag-over {
-  border-color: #60a5fa;
-  background: #f0f9ff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .block-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.block-header strong {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.block em {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 .remove-btn {
@@ -66,44 +104,62 @@
   opacity: 1;
 }
 
-/* Left Panel Items */
+.tab-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab-buttons button {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-buttons button.active {
+  background: var(--primary);
+  color: white;
+  border-color: transparent;
+}
+
 .tabs {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .tab {
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: white;
+  border: 1px solid var(--border);
+  background: var(--surface);
   cursor: grab;
   transition: all 0.2s;
-  font-size: 0.9rem;
-  user-select: none;
 }
 
 .tab:hover {
-  background: #f8fafc;
-  transform: translateX(2px);
+  transform: translateX(4px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* Right Panel Organization */
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.transcription-box {
-  width: 100%;
-  min-height: 150px;
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
   padding: 1rem;
-  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  font-family: inherit;
-  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+.focus-placeholder {
+  padding: 2rem;
+  text-align: center;
+  color: #94a3b8;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
 }
 
 .input-section {
@@ -113,107 +169,77 @@
 }
 
 .input-section input,
-.input-section select {
+.input-section select,
+.input-section textarea {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  padding: 0.875rem;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .input-section button {
-  padding: 0.75rem 1.25rem;
-  background: #3b82f6;
+  padding: 0.875rem;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 500;
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .input-section button:hover {
   background: #2563eb;
-}
-
-/* Toolbar Buttons */
-.tab-buttons button {
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.9rem;
-}
-
-.tab-buttons button.active {
-  background: #3b82f6;
-  color: white;
-  border-color: transparent;
-}
-
-/* Error Message */
-.error-message {
-  background: #fee2e2;
-  color: #dc2626;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-}
-
-/* Focus Area */
-.focus-bar {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(15,23,42,0.03);
-}
-
-.focus-placeholder {
-  padding: 2rem;
-  text-align: center;
-  color: #94a3b8;
-  border: 2px dashed #e2e8f0;
-  border-radius: 12px;
-}
-
-/* Depth Warning */
-.depth-warning {
-  font-size: 0.8rem;
-  color: #f59e0b;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  background: #fffbeb;
-  border-radius: 4px;
-}
-
-/* Text Readout */
-.bit-text-readout {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  font-family: 'Georgia', serif;
-  line-height: 1.6;
-  white-space: pre-wrap;
+  transform: translateY(-1px);
 }
 
 .refresh-btn {
-  margin-top: 1rem;
   width: 100%;
-  padding: 0.75rem;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  padding: 0.875rem;
+  margin-top: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .refresh-btn:hover {
-  background: #e2e8f0;
+  background: var(--background);
+}
+
+.insert-indicator.before {
+  top: -2px;
+}
+
+.insert-indicator.after {
+  bottom: -2px;
+}
+
+.insert-indicator.nest {
+  left: 24px;
+  right: 24px;
+  height: 4px;
+  background: #94a3b8;
+  opacity: 0.3;
+}
+
+.block-container.drag-over.nest .insert-indicator.nest {
+  opacity: 1;
+}
+
+/* Add these rules */
+.middle-panel {
+  overflow: visible; /* Changed from default */
+}
+
+.nested-blocks {
+  position: relative;
+  z-index: 1;
+}
+
+.block {
+  position: relative;
+  z-index: 2;
 }
