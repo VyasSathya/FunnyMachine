@@ -1,28 +1,60 @@
-// src/App.js
-
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import libraryData from "./mockData/library";
 
-function containsItem(root, targetId) {
-  if (root.id === targetId) return true;
-  if (!root.children) return false;
-  for (const child of root.children) {
-    if (containsItem(child, targetId)) return true;
+function findParent(root, targetId, parent = null) {
+  if (root.id === targetId) return parent;
+  if (root.children) {
+    for (const child of root.children) {
+      const result = findParent(child, targetId, root);
+      if (result) return result;
+    }
   }
-  return false;
+  return null;
+}
+
+function removeFromParent(root, targetId) {
+  const parent = findParent(root, targetId);
+  if (parent && parent.children) {
+    parent.children = parent.children.filter(child => child.id !== targetId);
+  }
+}
+
+function calculateDepth(node, currentDepth = 0) {
+  if (!node.children || node.children.length === 0) return currentDepth;
+  return Math.max(...node.children.map(child => 
+    calculateDepth(child, currentDepth + 1)
+  ));
 }
 
 const pastelColors = ["#d9f0ff", "#e3d9ff", "#d9ffec", "#ffe7d9", "#ffe5fa", "#fff4d9"];
 
-function renderBlock(item, level, onDropChild) {
-  const bg = pastelColors[Math.min(level, pastelColors.length - 1)];
+const validParentChildTypes = {
+  special: ['set'],
+  set: ['bit'],
+  bit: ['joke', 'bit'],
+  joke: ['idea'],
+  idea: ['idea']
+};
 
+function canNest(parentType, childType) {
+  if (childType === 'idea') return true;
+  return validParentChildTypes[parentType]?.includes(childType) || false;
+}
+
+function renderBlock(item, level, onDropChild, onRemoveChild, onDragStart) {
+  const bg = pastelColors[Math.min(level, pastelColors.length - 1)];
   return (
     <div
       key={item.id}
       className="block"
-      style={{ backgroundColor: bg, marginLeft: `${level * 24}px` }}
+      style={{ 
+        backgroundColor: bg, 
+        marginLeft: `${level * 24}px`,
+        cursor: level === 0 ? 'move' : 'grab'
+      }}
+      draggable
+      onDragStart={(e) => onDragStart(e, item)}
       onDragOver={(e) => {
         e.preventDefault();
         e.currentTarget.classList.add("drag-over");
@@ -36,14 +68,21 @@ function renderBlock(item, level, onDropChild) {
         onDropChild(e, item);
       }}
     >
-      <strong>{item.label}</strong>
-      <br />
-      <em style={{ fontSize: "0.85rem" }}>{item.text}</em>
-      <div style={{ fontSize: "0.7rem", color: "#888" }}>({item.type})</div>
+      <div className="block-header">
+        <strong>{item.label}</strong>
+        <button className="remove-btn" onClick={() => onRemoveChild(item)}>🗑️</button>
+      </div>
+      <em style={{ fontSize: "0.9rem", fontFamily: "Georgia, serif" }}>{item.text}</em>
+      <div style={{ fontSize: "0.75rem", color: "#666" }}>({item.type})</div>
       {Array.isArray(item.children) && item.children.length > 0 && (
         <div className="nested-blocks">
-          {item.children.map((child) => renderBlock(child, level + 1, onDropChild))}
+          {item.children.map((child) =>
+            renderBlock(child, level + 1, onDropChild, onRemoveChild, onDragStart)
+          )}
         </div>
+      )}
+      {level >= 3 && (
+        <div className="depth-warning">Maximum nesting depth reached</div>
       )}
     </div>
   );
@@ -55,217 +94,217 @@ export default function App() {
   const [focusItem, setFocusItem] = useState(null);
   const [activeTab, setActiveTab] = useState("builder");
   const [newItemName, setNewItemName] = useState("");
+  const [newItemType, setNewItemType] = useState("joke");
+  const [lastError, setLastError] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("comedyFocusItem");
-    if (saved) {
-      setFocusItem(JSON.parse(saved));
-    }
+    if (saved) setFocusItem(JSON.parse(saved));
     const savedLibrary = localStorage.getItem("comedyLibrary");
-    if (savedLibrary) {
-      setLibrary(JSON.parse(savedLibrary));
-    } else {
-      setLibrary(libraryData);
-    }
+    setLibrary(savedLibrary ? JSON.parse(savedLibrary) : libraryData);
   }, []);
 
   useEffect(() => {
     if (focusItem) {
       localStorage.setItem("comedyFocusItem", JSON.stringify(focusItem));
-      // Update library with modified focus item
-      setLibrary((prevLib) => {
-        const updated = prevLib.map((item) => (item.id === focusItem.id ? focusItem : item));
-        localStorage.setItem("comedyLibrary", JSON.stringify(updated));
-        return updated;
-      });
+      const updatedLib = library.map((item) => item.id === focusItem.id ? focusItem : item);
+      localStorage.setItem("comedyLibrary", JSON.stringify(updatedLib));
+      setLibrary(updatedLib);
     }
   }, [focusItem]);
 
-  function handleDragStart(e, item) {
+  const handleDragStart = (e, item) => {
     e.dataTransfer.setData("application/json", JSON.stringify(item));
-  }
-  function handleFocusDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove("drag-over");
-    const data = JSON.parse(e.dataTransfer.getData("application/json"));
-    if (focusItem && focusItem.id === data.id) return;
-    setFocusItem(structuredClone(data));
-  }
-  function allowDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add("drag-over");
-  }
-  function handleDragLeave(e) {
-    e.currentTarget.classList.remove("drag-over");
-  }
-  function handleDropIntoChild(e, parent) {
-    e.preventDefault();
-    e.currentTarget.classList.remove("drag-over");
-    const data = JSON.parse(e.dataTransfer.getData("application/json"));
-    if (!parent.children) parent.children = [];
-    if (containsItem(parent, data.id)) return;
-    parent.children.push(structuredClone(data));
-    setFocusItem({ ...focusItem });
-  }
+  };
 
-  function renderBuilderTab() {
-    if (!focusItem) {
-      return <div className="tool-desc">No item in focus. Drag/click from library to focus.</div>;
-    }
-    if (["bit", "set", "special"].includes(focusItem.type) && !focusItem.children) {
-      focusItem.children = [];
-    }
-    return (
-      <div
-        className="builder-area drop-zone"
-        onDragOver={allowDrop}
-        onDragLeave={handleDragLeave}
-        onDrop={(e) => {
-          e.preventDefault();
-          e.currentTarget.classList.remove("drag-over");
-          const data = JSON.parse(e.dataTransfer.getData("application/json"));
-          if (!focusItem.children) focusItem.children = [];
-          if (containsItem(focusItem, data.id)) return;
-          focusItem.children.push(structuredClone(data));
-          setFocusItem({ ...focusItem });
-        }}
-      >
-        {renderBlock(focusItem, 0, handleDropIntoChild)}
-      </div>
-    );
-  }
+  const handleFocusDrop = (e) => {
+    e.preventDefault();
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+    if (!focusItem || focusItem.id !== data.id) setFocusItem(structuredClone(data));
+  };
 
-  function renderTextTab() {
-    if (!focusItem) return <div className="tool-desc">No focus item. Drag/click from library.</div>;
-    let lines = [];
-    function printItem(it, depth = 0) {
-      const prefix = "  ".repeat(depth);
-      lines.push(prefix + (it.text || it.label));
-      if (it.children && it.children.length > 0) {
-        for (const c of it.children) {
-          printItem(c, depth + 1);
+  const handleDropIntoChild = (e, newParent) => {
+    e.preventDefault();
+    const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
+    
+    // Clone the entire focus item structure
+    const updatedFocus = structuredClone(focusItem);
+    
+    // Remove the dragged item from its previous location
+    removeFromParent(updatedFocus, draggedItem.id);
+    
+    // Find the new parent in the cloned structure
+    function findNode(root, targetId) {
+      if (root.id === targetId) return root;
+      if (root.children) {
+        for (const child of root.children) {
+          const found = findNode(child, targetId);
+          if (found) return found;
         }
       }
+      return null;
     }
-    printItem(focusItem, 0);
-    return <pre style={{ padding: "8px", background: "#f9f9f9", borderRadius: 4 }}>{lines.join("\n")}</pre>;
-  }
-
-  const categories = ["idea", "joke", "bit", "set", "special"];
-  const filteredLib = library.filter((item) => item.type === activeLibCategory);
-
-  const tabContentMap = {
-    builder: renderBuilderTab(),
-    text: renderTextTab(),
-    versions: <div className="tool-desc">Versions for {focusItem?.label}</div>,
-    tags: <div className="tool-desc">Tags for {focusItem?.label}</div>
+    
+    const actualNewParent = findNode(updatedFocus, newParent.id);
+    
+    // Validation checks
+    if (!actualNewParent) {
+      setLastError("Invalid drop target");
+      setTimeout(() => setLastError(""), 3000);
+      return;
+    }
+    
+    if (!canNest(actualNewParent.type, draggedItem.type)) {
+      setLastError(`${draggedItem.type} cannot nest in ${actualNewParent.type}`);
+      setTimeout(() => setLastError(""), 3000);
+      return;
+    }
+    
+    if (draggedItem.id === actualNewParent.id || findNode(draggedItem, actualNewParent.id)) {
+      setLastError("Circular references not allowed!");
+      setTimeout(() => setLastError(""), 3000);
+      return;
+    }
+    
+    const currentDepth = calculateDepth(actualNewParent);
+    if (currentDepth >= 3 && draggedItem.type === 'bit') {
+      setLastError("Maximum bit nesting depth (3) reached!");
+      setTimeout(() => setLastError(""), 3000);
+      return;
+    }
+    
+    // Add to new parent
+    if (!actualNewParent.children) actualNewParent.children = [];
+    actualNewParent.children.push(structuredClone(draggedItem));
+    
+    // Update state
+    setFocusItem(updatedFocus);
   };
+
+  const handleRemoveChild = (target) => {
+    const updated = structuredClone(focusItem);
+    const recurseRemove = (node) => {
+      if (node.children) {
+        node.children = node.children.filter(child => child.id !== target.id);
+        node.children.forEach(recurseRemove);
+      }
+    };
+    recurseRemove(updated);
+    setFocusItem(updated);
+  };
+
+  const refreshLibrary = () => {
+    localStorage.removeItem("comedyFocusItem");
+    localStorage.removeItem("comedyLibrary");
+    setFocusItem(null);
+    setLibrary(libraryData);
+  };
+
+  const renderBuilderTab = () => (
+    focusItem ? (
+      <div className="builder-area drop-zone">
+        {renderBlock(focusItem, 0, handleDropIntoChild, handleRemoveChild, handleDragStart)}
+      </div>
+    ) : <div className="tool-desc">Drag/click from library to focus</div>
+  );
+
+  const renderTextTab = () => {
+    if (!focusItem) return <div className="tool-desc">No focus item</div>;
+    const lines = [];
+    const printItem = (it, depth) => {
+      lines.push("  ".repeat(depth) + "- " + (it.text || it.label));
+      it.children?.forEach(c => printItem(c, depth + 1));
+    };
+    printItem(focusItem, 0);
+    return <pre className="bit-text-readout">{lines.join("\n")}</pre>;
+  };
+
+  const categories = ["special", "set", "bit", "joke", "idea"];
 
   return (
     <div className="layout">
       <div className="left-panel">
-        <h2 className="panel-header">📚 Library</h2>
+        <h2>📚 Library</h2>
         <div className="tab-buttons">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              className={cat === activeLibCategory ? "active" : ""}
-              onClick={() => setActiveLibCategory(cat)}
-            >
-              {cat}
+          {categories.map(cat => (
+            <button key={cat} className={cat === activeLibCategory ? "active" : ""} 
+              onClick={() => setActiveLibCategory(cat)}>
+              {cat.charAt(0).toUpperCase() + cat.slice(1)}
             </button>
           ))}
         </div>
         <div className="tabs">
-          {filteredLib.map((item) => (
-            <div
-              key={item.id}
-              className="tab"
-              draggable
-              style={{ cursor: "grab" }}
+          {library.filter(item => item.type === activeLibCategory).map(item => (
+            <div key={item.id} className="tab" draggable
               onDragStart={(e) => handleDragStart(e, item)}
               onClick={() => setFocusItem(structuredClone(item))}
-            >
+              style={{ backgroundColor: pastelColors[categories.indexOf(item.type)] }}>
               {item.label || item.text}
             </div>
           ))}
         </div>
+        <button className="refresh-btn" onClick={refreshLibrary}>🔄 Reset</button>
       </div>
 
       <div className="middle-panel">
-        <div
-          className="focus-bar drop-zone"
-          onDragOver={allowDrop}
-          onDragLeave={handleDragLeave}
-          onDrop={handleFocusDrop}
-        >
+        <div className="error-banner">
+          {lastError && <div className="error-message">⚠️ {lastError}</div>}
+        </div>
+        <div className="focus-bar drop-zone" onDrop={handleFocusDrop}>
           <h3>🎯 Focus</h3>
           {focusItem ? (
-            <div
-              className="block"
-              style={{ backgroundColor: pastelColors[0] }}
-              draggable
-              onDragStart={(e) => handleDragStart(e, focusItem)}
-            >
+            <div className="block" draggable onDragStart={(e) => handleDragStart(e, focusItem)}>
               <strong>{focusItem.label}</strong>
-              <br />
-              <em style={{ fontSize: "0.85rem" }}>{focusItem.text}</em>
-              <div style={{ fontSize: "0.7rem", color: "#777" }}>({focusItem.type})</div>
+              <em>{focusItem.text}</em>
+              <div>({focusItem.type})</div>
             </div>
-          ) : (
-            <div className="focus-placeholder">Drag/click something here to focus</div>
-          )}
+          ) : <div className="focus-placeholder">Drag item here</div>}
         </div>
 
         <div className="middle-panel-tools">
           <div className="tab-buttons">
-            {Object.keys(tabContentMap).map((tabKey) => (
-              <button
-                key={tabKey}
-                className={tabKey === activeTab ? "active" : ""}
-                onClick={() => setActiveTab(tabKey)}
-              >
-                {tabKey}
+            {["builder", "text", "versions", "tags"].map(tab => (
+              <button key={tab} className={tab === activeTab ? "active" : ""} 
+                onClick={() => setActiveTab(tab)}>
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>
-          <div className="tab-content" style={{ overflow: "auto", flex: "1" }}>
-            {tabContentMap[activeTab]}
+          <div className="tab-content">
+            {{
+              builder: renderBuilderTab(),
+              text: renderTextTab(),
+              versions: <div>Versions for {focusItem?.label}</div>,
+              tags: <div>Tags for {focusItem?.label}</div>
+            }[activeTab]}
           </div>
         </div>
       </div>
 
       <div className="right-panel">
-        <h2 className="panel-header">New Material</h2>
-        <div className="input-section" style={{ marginBottom: "8px" }}>
-          <button>Text</button>
-          <button>Record</button>
-          <button>Upload</button>
-          <button>Organize</button>
+        <h2>New Material</h2>
+        <textarea className="transcription-box" placeholder="Transcript..." />
+        <div className="input-section">
+          <button>🎙️ Record</button>
+          <button>📁 Upload</button>
+          <button>✨ Organize</button>
         </div>
-        <div>
-          <input
-            placeholder="New item name"
-            value={newItemName}
-            onChange={(e) => setNewItemName(e.target.value)}
-            style={{ marginBottom: "4px", padding: "4px" }}
-          />
-          <button
-            onClick={() => {
-              if (!newItemName.trim()) return;
-              const newObj = {
-                id: Math.random().toString(36).slice(2),
-                type: "joke",
-                label: newItemName,
-                text: newItemName
-              };
-              setLibrary([...library, newObj]);
-              setNewItemName("");
-            }}
-          >
-            + Add
-          </button>
-        </div>
+        <input value={newItemName} onChange={(e) => setNewItemName(e.target.value)} 
+          placeholder="New item name" />
+        <select value={newItemType} onChange={(e) => setNewItemType(e.target.value)}>
+          {categories.map(type => <option key={type} value={type}>{type}</option>)}
+        </select>
+        <button onClick={() => {
+          if (newItemName.trim()) {
+            setLibrary([...library, {
+              id: Math.random().toString(36).slice(2),
+              type: newItemType,
+              label: newItemName,
+              text: newItemName
+            }]);
+            setNewItemName("");
+          }
+        }}>+ Add</button>
       </div>
     </div>
   );
