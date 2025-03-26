@@ -1,5 +1,14 @@
+# Project Structure: styles
+# Generated on: 03/26/2025 00:12:49
+
+|   |   +-- Analysis.css
+|   |   +-- AnalysisTabs.css
+|   |   +-- AnalyzeSection.css
+|   |   +-- BlockComponent.css
+|   |   +-- OrganizedMaterial.css
+|   +-- utils
 # Project Structure: utils
-# Generated on: 03/25/2025 07:04:17
+# Generated on: 03/26/2025 00:12:49
 
 |   +-- App.css
 |   +-- App.js

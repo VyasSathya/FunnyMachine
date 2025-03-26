@@ -58,6 +58,7 @@ const typeColors = {
 };
 
 export default function App() {
+  // Left panel: using "activeLibCategory" to filter library items.
   const [library, setLibrary] = useState([]);
   const [activeLibCategory, setActiveLibCategory] = useState("joke");
   const [focusItem, setFocusItem] = useState(null);
@@ -67,14 +68,20 @@ export default function App() {
   const [lastError, setLastError] = useState("");
   const [history, setHistory] = useState([]);
   const [future, setFuture] = useState([]);
+  // State for AI-related UI:
+  // When no model is selected and showModelDropdown is false, we show the "Analyze" button.
+  // When showModelDropdown is true, we show a dropdown (inline with the tab buttons).
+  // When a model is selected, we show the four AI improvement buttons.
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(null);
 
-  // Initial load from localStorage
+  // Library and focus item initial load from localStorage or libraryData
   useEffect(() => {
     const savedFocus = localStorage.getItem("comedyFocusItem");
     const savedLibrary = localStorage.getItem("comedyLibrary");
     if (savedFocus) setFocusItem(JSON.parse(savedFocus));
     setLibrary(savedLibrary ? JSON.parse(savedLibrary) : libraryData);
-  }, []); 
+  }, []);
 
   // Sync focus item to localStorage and update library
   useEffect(() => {
@@ -106,7 +113,16 @@ export default function App() {
       }
     }
   }, [focusItem]);
-  
+
+  // When focus item changes, reset tab to builder and clear AI selections
+  useEffect(() => {
+    if (focusItem) {
+      setActiveTab("builder");
+      setShowModelDropdown(false);
+      setSelectedModel(null);
+    }
+  }, [focusItem]);
+
   const handleDragStart = (e, item) => {
     e.dataTransfer.setData("application/json", JSON.stringify(item));
   };
@@ -143,16 +159,13 @@ export default function App() {
     setHistory(prev => [...prev, future[0]]);
   };
 
-  // ─── Nesting Handler (for nesting dragged elements) ─────────────
+  // ─── Nesting Handler (for nesting dragged elements)
   const handleDropIntoChild = (e, targetItem) => {
     e.preventDefault();
     const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
-    
-    // Clone the focus tree to avoid direct mutation
     const updatedFocus = structuredClone(focusItem);
     removeFromParent(updatedFocus, draggedItem.id);
-    
-    // Find the target node in the updated tree
+
     const findNode = (node, id) => {
       if (node.id === id) return node;
       if (node.children) {
@@ -163,21 +176,18 @@ export default function App() {
       }
       return null;
     };
-    
+
     const actualNewParent = findNode(updatedFocus, targetItem.id);
     if (!actualNewParent) {
       setLastError("Invalid drop target");
       setTimeout(() => setLastError(""), 3000);
       return;
     }
-    
     if (!canNest(actualNewParent.type, draggedItem.type)) {
       setLastError(`${draggedItem.type} cannot nest in ${actualNewParent.type}`);
       setTimeout(() => setLastError(""), 3000);
       return;
     }
-    
-    // Prevent circular references
     const checkCircular = (node, id) => {
       if (node.id === id) return true;
       if (node.children) {
@@ -190,8 +200,6 @@ export default function App() {
       setTimeout(() => setLastError(""), 3000);
       return;
     }
-    
-    // Compute new level for the dragged item based on its intended parent
     const parentLevel = computeLevel(updatedFocus, actualNewParent.id);
     const newChildLevel = parentLevel + 1;
     if (draggedItem.type === 'bit' && newChildLevel > 3) {
@@ -199,22 +207,17 @@ export default function App() {
       setTimeout(() => setLastError(""), 3000);
       return;
     }
-    
     if (!actualNewParent.children) actualNewParent.children = [];
     actualNewParent.children.push(structuredClone(draggedItem));
-    
     setFocusItem(updatedFocus);
   };
 
-  // ─── Reorder Handler (for moving elements within the same container) ─────────────
+  // ─── Reorder Handler (for moving elements within the same container)
   const handleReorder = (e, parentItem, dropIndex) => {
     e.preventDefault();
     const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
-    
-    // Clone the focus tree to work on
     const updatedFocus = structuredClone(focusItem);
 
-    // Helper to find a node by id in the tree
     const findNode = (node, id) => {
       if (node.id === id) return node;
       if (node.children) {
@@ -232,22 +235,15 @@ export default function App() {
       setTimeout(() => setLastError(""), 3000);
       return;
     }
-    
-    // Find the current index of the dragged item
     const currentIndex = targetParent.children.findIndex(child => child.id === draggedItem.id);
     if (currentIndex === -1) {
       setLastError("Item not found in the target container");
       setTimeout(() => setLastError(""), 3000);
       return;
     }
-
-    // Remove the dragged item from its current position
     const [itemToMove] = targetParent.children.splice(currentIndex, 1);
-
-    // Clamp the dropIndex to be within valid bounds
     const clampedIndex = Math.max(0, Math.min(dropIndex, targetParent.children.length));
     targetParent.children.splice(clampedIndex, 0, itemToMove);
-    
     setFocusItem(updatedFocus);
   };
 
@@ -268,17 +264,13 @@ export default function App() {
     setLibrary(libraryData);
   };
 
+  // Library category filter buttons
   const categories = ["special", "set", "bit", "joke", "idea"];
 
-  // ─── Render for the Builder Tab ─────────────────────────────
+  // ─── Render for the Builder Tab (Middle Panel) ─────────────────────────────
   const renderBuilderTab = () => (
     focusItem ? (
       <div className="builder-area drop-zone">
-        {/* 
-          BlockComponent is expected to render its children with appropriate
-          drop zones for reordering and nesting. It will call handleReorder and
-          handleDropIntoChild as needed.
-        */}
         <BlockComponent
           item={focusItem}
           level={0}
@@ -303,67 +295,74 @@ export default function App() {
     printItem(focusItem, 0);
     return <pre className="bit-text-readout">{lines.join("\n")}</pre>;
   };
-  
 
   return (
     <div className="layout">
+      {/* Left Panel: Library */}
       <div className="left-panel">
         <h2>📚 Library</h2>
+        {/* Category Filter Buttons */}
         <div className="tab-buttons">
           {categories.map(cat => (
             <button
               key={cat}
-              className={cat === activeLibCategory ? "active" : ""}
+              className={`btn btn-category ${cat === activeLibCategory ? "active" : ""}`}
               onClick={() => setActiveLibCategory(cat)}
             >
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
             </button>
           ))}
         </div>
+        {/* Library Items */}
         <div className="tabs">
           {library
             .filter(item => item.type === activeLibCategory)
             .map(item => (
-              <div
+              <button
                 key={item.id}
-                className="tab"
+                className="btn tab"
+                style={{ backgroundColor: typeColors[item.type] || "#fff" }}
                 draggable
                 onDragStart={(e) => handleDragStart(e, item)}
                 onClick={() => setFocusItem(structuredClone(item))}
-                // Apply uniform background based on item type
-                style={{ backgroundColor: typeColors[item.type] || "#fff" }}
               >
                 {item.label || item.text}
-              </div>
+              </button>
             ))}
         </div>
-        <button className="refresh-btn" onClick={refreshLibrary}>
+        <button className="btn refresh-btn" onClick={refreshLibrary}>
           🔄 Reset Library
         </button>
       </div>
 
+      {/* Middle Panel: Focused Material & Tabs */}
       <div className="middle-panel">
-        <div 
+        <div
           className="focus-bar drop-zone"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleFocusDrop}
         >
           <h3>🎯 Focused Material</h3>
           {focusItem ? (
-            <div className="block" draggable onDragStart={(e) => handleDragStart(e, focusItem)}>
+            <div
+              className="block"
+              draggable
+              onDragStart={(e) => handleDragStart(e, focusItem)}
+            >
               <strong>{focusItem.label}</strong>
               <em>{focusItem.text}</em>
               <div>({focusItem.type})</div>
             </div>
           ) : (
-            <div className="focus-placeholder">Drag item here to start building</div>
+            <div className="focus-placeholder">
+              Drag item here to start building
+            </div>
           )}
         </div>
-
-        {/* Tab Buttons & Content */}
+        {/* Middle Panel Tab Buttons & Content */}
         <div className="middle-panel-tools">
           <div className="tab-buttons">
-            {["builder", "text", "versions", "tags"].map(tab => (
+            {["builder", "text", "versions"].map(tab => (
               <button
                 key={tab}
                 className={tab === activeTab ? "active" : ""}
@@ -372,19 +371,75 @@ export default function App() {
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
+            {/* AI-related UI */}
+            {selectedModel ? (
+              // When a model has been selected, show the 4 AI improvement buttons
+              ["Polish", "Tweak", "Revamp", "Boost"].map(action => (
+                <button
+                  key={action}
+                  className={activeTab === action ? "active" : ""}
+                  onClick={() => {
+                    alert(`${action} feature not implemented yet`);
+                    setActiveTab(action);
+                  }}
+                >
+                  {action}
+                </button>
+              ))
+            ) : showModelDropdown ? (
+              // Show the dropdown inline with tab buttons (same size/alignment as the Analyze button)
+              <select
+                onChange={(e) => {
+                  const model = e.target.value;
+                  if (model) {
+                    setSelectedModel(model);
+                    alert(`Selected model: ${model}`);
+                    // Optionally, set activeTab here if desired
+                    setActiveTab("analyze");
+                  }
+                }}
+                style={{ padding: "0.5rem", fontSize: "1rem" }}
+              >
+                <option value="" disabled>
+                  Select Model
+                </option>
+                <option value="Deepseek">Deepseek</option>
+                <option value="O1">O1</option>
+              </select>
+            ) : (
+              // Default: show the Analyze button
+              <button
+                className={activeTab === "analyze" ? "active" : ""}
+                onClick={() => {
+                  setShowModelDropdown(true);
+                  setActiveTab("analyze");
+                }}
+              >
+                Analyze
+              </button>
+            )}
           </div>
           <div className="tab-content">
             {activeTab === "builder" && renderBuilderTab()}
             {activeTab === "text" && renderTextTab()}
-            {activeTab === "versions" && <div>Versions for {focusItem?.label}</div>}
-            {activeTab === "tags" && <div>Tags for {focusItem?.label}</div>}
+            {activeTab === "versions" && (
+              <div>Versions for {focusItem?.label}</div>
+            )}
+            {/* For AI-related tabs, leave tab-content empty for now */}
+            {["analyze", "Polish", "Tweak", "Revamp", "Boost"].includes(activeTab) && (
+              <div className="ai-placeholder">
+                {/* AI functionality will be integrated here later */}
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Error message moved to the bottom of the middle panel */}
-        {lastError && <div className="error-message">⚠️ {lastError}</div>}
+        {/* Error message at the bottom */}
+        {lastError && (
+          <div className="error-message">⚠️ {lastError}</div>
+        )}
       </div>
 
+      {/* Right Panel: New Material */}
       <div className="right-panel">
         <h2>➕ New Material</h2>
         <div className="input-section">
@@ -393,10 +448,17 @@ export default function App() {
             placeholder="Paste/type new material here..."
             rows={6}
           />
-          <div className="input-buttons" style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-            <button>🎙️ Record</button>
-            <button>📁 Upload</button>
-            <button className="blue-btn">✨ Organize</button>
+          <div
+            className="input-buttons"
+            style={{
+              display: "flex",
+              gap: "1rem",
+              marginBottom: "1rem",
+            }}
+          >
+            <button className="btn">🎙️ Record</button>
+            <button className="btn">📁 Upload</button>
+            <button className="btn blue-btn">✨ Organize</button>
           </div>
           <input
             value={newItemName}
@@ -414,15 +476,19 @@ export default function App() {
             ))}
           </select>
           <button
+            className="btn"
             onClick={() => {
               if (newItemName.trim()) {
-                setLibrary([...library, {
-                  id: Math.random().toString(36).slice(2),
-                  type: newItemType,
-                  label: newItemName,
-                  text: newItemName,
-                  children: []
-                }]);
+                setLibrary([
+                  ...library,
+                  {
+                    id: Math.random().toString(36).slice(2),
+                    type: newItemType,
+                    label: newItemName,
+                    text: newItemName,
+                    children: [],
+                  },
+                ]);
                 setNewItemName("");
               }
             }}
