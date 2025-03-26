@@ -3,7 +3,7 @@ import "./App.css";
 import libraryData from "./mockData/library";
 import BlockComponent from "./components/BlockComponent";
 
-// Finds the parent of the node with targetId
+// Utility functions for tree operations
 function findParent(root, targetId, parent = null) {
   if (root.id === targetId) return parent;
   if (root.children) {
@@ -15,7 +15,6 @@ function findParent(root, targetId, parent = null) {
   return null;
 }
 
-// Removes a node with targetId from its parent's children
 function removeFromParent(root, targetId) {
   const parent = findParent(root, targetId);
   if (parent?.children) {
@@ -23,7 +22,6 @@ function removeFromParent(root, targetId) {
   }
 }
 
-// Computes the level (depth) of a node relative to the focus tree root
 function computeLevel(root, targetId, currentLevel = 0) {
   if (root.id === targetId) return currentLevel;
   if (root.children) {
@@ -48,34 +46,56 @@ function canNest(parentType, childType) {
   return validParentChildTypes[parentType]?.includes(childType) ?? false;
 }
 
-// Color mapping for uniform library item backgrounds and blocks
 const typeColors = {
-  special: "#ffadad", // light red
-  set: "#ffd6a5",     // light orange
-  bit: "#fdffb6",     // light yellow
-  joke: "#caffbf",    // light green
-  idea: "#9bf6ff"     // light blue
+  special: "#ffadad",
+  set: "#ffd6a5",
+  bit: "#fdffb6",
+  joke: "#caffbf",
+  idea: "#9bf6ff"
+};
+
+// Define improvement buttons for each type
+const improvementButtonsByType = {
+  joke: ["Polish", "Tweak", "Revamp", "Boost"],
+  bit: ["Enhance", "Refine", "Energize", "Spark"],
+  set: ["Elevate", "Optimize", "Augment", "Inspire"],
+  special: ["Enrich", "Amplify", "Refine", "Ignite"],
+  idea: ["Polish", "Tweak", "Revamp", "Boost"]
 };
 
 export default function App() {
-  // Left panel: using "activeLibCategory" to filter library items.
+  // Library and focus states
   const [library, setLibrary] = useState([]);
   const [activeLibCategory, setActiveLibCategory] = useState("joke");
   const [focusItem, setFocusItem] = useState(null);
+
+  // Tab state; initial active tab is "builder"
   const [activeTab, setActiveTab] = useState("builder");
+
+  // New material state
   const [newItemName, setNewItemName] = useState("");
   const [newItemType, setNewItemType] = useState("joke");
+
   const [lastError, setLastError] = useState("");
   const [history, setHistory] = useState([]);
   const [future, setFuture] = useState([]);
-  // State for AI-related UI:
-  // When no model is selected and showModelDropdown is false, we show the "Analyze" button.
-  // When showModelDropdown is true, we show a dropdown (inline with the tab buttons).
-  // When a model is selected, we show the four AI improvement buttons.
-  const [showModelDropdown, setShowModelDropdown] = useState(false);
-  const [selectedModel, setSelectedModel] = useState(null);
 
-  // Library and focus item initial load from localStorage or libraryData
+  // AI-related state
+  // selectedModel: when empty (""), no model is selected.
+  // We also control the visibility of the dropdown via a flag.
+  const [selectedModel, setSelectedModel] = useState("");
+  const [showAIDropdown, setShowAIDropdown] = useState(true); // true initially
+
+  // When focus item changes, reset AI state and default to showing dropdown.
+  useEffect(() => {
+    if (focusItem) {
+      setActiveTab("builder");
+      setSelectedModel("");
+      setShowAIDropdown(true);
+    }
+  }, [focusItem]);
+
+  // Initial load
   useEffect(() => {
     const savedFocus = localStorage.getItem("comedyFocusItem");
     const savedLibrary = localStorage.getItem("comedyLibrary");
@@ -96,14 +116,9 @@ export default function App() {
         localStorage.setItem("comedyFocusItem", data);
         setLibrary(prevLibrary => {
           const exists = prevLibrary.some(item => item.id === focusItem.id);
-          let updatedLib;
-          if (exists) {
-            updatedLib = prevLibrary.map(item =>
-              item.id === focusItem.id ? focusItem : item
-            );
-          } else {
-            updatedLib = [...prevLibrary, focusItem];
-          }
+          const updatedLib = exists
+            ? prevLibrary.map(item => (item.id === focusItem.id ? focusItem : item))
+            : [...prevLibrary, focusItem];
           localStorage.setItem("comedyLibrary", JSON.stringify(updatedLib));
           return updatedLib;
         });
@@ -111,15 +126,6 @@ export default function App() {
         localStorage.removeItem("comedyFocusItem");
         window.location.reload();
       }
-    }
-  }, [focusItem]);
-
-  // When focus item changes, reset tab to builder and clear AI selections
-  useEffect(() => {
-    if (focusItem) {
-      setActiveTab("builder");
-      setShowModelDropdown(false);
-      setSelectedModel(null);
     }
   }, [focusItem]);
 
@@ -137,7 +143,7 @@ export default function App() {
 
   useEffect(() => {
     if (focusItem) {
-      setHistory(prev => [...prev.slice(-9), focusItem]); // Keep last 10 states
+      setHistory(prev => [...prev.slice(-9), focusItem]);
       setFuture([]);
     }
   }, [focusItem]);
@@ -159,13 +165,12 @@ export default function App() {
     setHistory(prev => [...prev, future[0]]);
   };
 
-  // ─── Nesting Handler (for nesting dragged elements)
+  // Handler for nesting dragged elements
   const handleDropIntoChild = (e, targetItem) => {
     e.preventDefault();
     const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
     const updatedFocus = structuredClone(focusItem);
     removeFromParent(updatedFocus, draggedItem.id);
-
     const findNode = (node, id) => {
       if (node.id === id) return node;
       if (node.children) {
@@ -176,7 +181,6 @@ export default function App() {
       }
       return null;
     };
-
     const actualNewParent = findNode(updatedFocus, targetItem.id);
     if (!actualNewParent) {
       setLastError("Invalid drop target");
@@ -212,12 +216,11 @@ export default function App() {
     setFocusItem(updatedFocus);
   };
 
-  // ─── Reorder Handler (for moving elements within the same container)
+  // Handler for reordering elements
   const handleReorder = (e, parentItem, dropIndex) => {
     e.preventDefault();
     const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
     const updatedFocus = structuredClone(focusItem);
-
     const findNode = (node, id) => {
       if (node.id === id) return node;
       if (node.children) {
@@ -228,7 +231,6 @@ export default function App() {
       }
       return null;
     };
-
     const targetParent = findNode(updatedFocus, parentItem.id);
     if (!targetParent || !Array.isArray(targetParent.children)) {
       setLastError("Invalid reorder target");
@@ -264,10 +266,10 @@ export default function App() {
     setLibrary(libraryData);
   };
 
-  // Library category filter buttons
+  // Library category buttons
   const categories = ["special", "set", "bit", "joke", "idea"];
 
-  // ─── Render for the Builder Tab (Middle Panel) ─────────────────────────────
+  // Render functions for tab content
   const renderBuilderTab = () => (
     focusItem ? (
       <div className="builder-area drop-zone">
@@ -296,12 +298,16 @@ export default function App() {
     return <pre className="bit-text-readout">{lines.join("\n")}</pre>;
   };
 
+  // Determine which improvement buttons to show based on focus item type.
+  const improvementButtons = focusItem && improvementButtonsByType[focusItem.type]
+    ? improvementButtonsByType[focusItem.type]
+    : ["Polish", "Tweak", "Revamp", "Boost"];
+
   return (
     <div className="layout">
       {/* Left Panel: Library */}
       <div className="left-panel">
         <h2>📚 Library</h2>
-        {/* Category Filter Buttons */}
         <div className="tab-buttons">
           {categories.map(cat => (
             <button
@@ -313,7 +319,6 @@ export default function App() {
             </button>
           ))}
         </div>
-        {/* Library Items */}
         <div className="tabs">
           {library
             .filter(item => item.type === activeLibCategory)
@@ -335,7 +340,7 @@ export default function App() {
         </button>
       </div>
 
-      {/* Middle Panel: Focused Material & Tabs */}
+      {/* Middle Panel: Focused Material & Tab Controls */}
       <div className="middle-panel">
         <div
           className="focus-bar drop-zone"
@@ -359,84 +364,85 @@ export default function App() {
             </div>
           )}
         </div>
-        {/* Middle Panel Tab Buttons & Content */}
+        {/* Tab Buttons & AI Controls */}
         <div className="middle-panel-tools">
-          <div className="tab-buttons">
-            {["builder", "text", "versions"].map(tab => (
-              <button
-                key={tab}
-                className={tab === activeTab ? "active" : ""}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-            {/* AI-related UI */}
-            {selectedModel ? (
-              // When a model has been selected, show the 4 AI improvement buttons
-              ["Polish", "Tweak", "Revamp", "Boost"].map(action => (
+          <div className="tab-buttons-container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div className="tab-buttons-left">
+              {["builder", "text", "versions"].map(tab => (
                 <button
-                  key={action}
-                  className={activeTab === action ? "active" : ""}
+                  key={tab}
+                  className={tab === activeTab ? "active" : ""}
                   onClick={() => {
-                    alert(`${action} feature not implemented yet`);
-                    setActiveTab(action);
+                    setActiveTab(tab);
+                    // Reset AI state when switching tabs.
+                    setSelectedModel("");
+                    setShowAIDropdown(true);
                   }}
                 >
-                  {action}
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </button>
-              ))
-            ) : showModelDropdown ? (
-              // Show the dropdown inline with tab buttons (same size/alignment as the Analyze button)
-              <select
-                onChange={(e) => {
-                  const model = e.target.value;
-                  if (model) {
-                    setSelectedModel(model);
-                    alert(`Selected model: ${model}`);
-                    // Optionally, set activeTab here if desired
+              ))}
+              {/* Render the Analyze button only if activeTab is not "analyze" */}
+              {activeTab !== "analyze" && (
+                <button
+                  onClick={() => {
+                    // When Analyze is clicked, auto-select "Deepseek"
                     setActiveTab("analyze");
-                  }
-                }}
-                style={{ padding: "0.5rem", fontSize: "1rem" }}
-              >
-                <option value="" disabled>
-                  Select Model
-                </option>
-                <option value="Deepseek">Deepseek</option>
-                <option value="O1">O1</option>
-              </select>
-            ) : (
-              // Default: show the Analyze button
-              <button
-                className={activeTab === "analyze" ? "active" : ""}
-                onClick={() => {
-                  setShowModelDropdown(true);
-                  setActiveTab("analyze");
-                }}
-              >
-                Analyze
-              </button>
-            )}
+                    setSelectedModel("Deepseek");
+                    setShowAIDropdown(false);
+                  }}
+                >
+                  Analyze
+                </button>
+              )}
+            </div>
+            <div className="tab-buttons-right">
+              {/* In the initial state (when activeTab is not analyze), show the AI dropdown */}
+              {activeTab !== "analyze" && showAIDropdown && (
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  style={{ padding: "0.5rem", fontSize: "1rem" }}
+                >
+                  <option value="">Select Model</option>
+                  <option value="Deepseek">Deepseek</option>
+                  <option value="O1">O1</option>
+                </select>
+              )}
+              {/* When activeTab is "analyze" and a model is selected, show improvement buttons */}
+              {activeTab === "analyze" && selectedModel && (
+                improvementButtons.map(action => (
+                  <button
+                    key={action}
+                    className={activeTab === action ? "active" : ""}
+                    onClick={() => {
+                      alert(`${action} feature not implemented yet`);
+                      setActiveTab(action);
+                    }}
+                  >
+                    {action}
+                  </button>
+                ))
+              )}
+            </div>
           </div>
           <div className="tab-content">
             {activeTab === "builder" && renderBuilderTab()}
             {activeTab === "text" && renderTextTab()}
-            {activeTab === "versions" && (
-              <div>Versions for {focusItem?.label}</div>
-            )}
-            {/* For AI-related tabs, leave tab-content empty for now */}
-            {["analyze", "Polish", "Tweak", "Revamp", "Boost"].includes(activeTab) && (
+            {activeTab === "versions" && <div>Versions for {focusItem?.label}</div>}
+            {activeTab === "analyze" && (
               <div className="ai-placeholder">
-                {/* AI functionality will be integrated here later */}
+                {/* AI analysis content can be integrated here */}
+              </div>
+            )}
+            {["Polish", "Tweak", "Revamp", "Boost", "Enhance", "Refine", "Energize", "Spark", "Elevate", "Optimize", "Augment", "Inspire", "Enrich", "Amplify", "Ignite"].includes(activeTab) && (
+              <div className="ai-placeholder">
+                {/* AI improvement content can be integrated here */}
               </div>
             )}
           </div>
         </div>
-        {/* Error message at the bottom */}
-        {lastError && (
-          <div className="error-message">⚠️ {lastError}</div>
-        )}
+        {lastError && <div className="error-message">⚠️ {lastError}</div>}
       </div>
 
       {/* Right Panel: New Material */}
@@ -448,14 +454,7 @@ export default function App() {
             placeholder="Paste/type new material here..."
             rows={6}
           />
-          <div
-            className="input-buttons"
-            style={{
-              display: "flex",
-              gap: "1rem",
-              marginBottom: "1rem",
-            }}
-          >
+          <div className="input-buttons" style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
             <button className="btn">🎙️ Record</button>
             <button className="btn">📁 Upload</button>
             <button className="btn blue-btn">✨ Organize</button>
@@ -465,10 +464,7 @@ export default function App() {
             onChange={(e) => setNewItemName(e.target.value)}
             placeholder="Enter item name"
           />
-          <select
-            value={newItemType}
-            onChange={(e) => setNewItemType(e.target.value)}
-          >
+          <select value={newItemType} onChange={(e) => setNewItemType(e.target.value)}>
             {categories.map(type => (
               <option key={type} value={type}>
                 {type.charAt(0).toUpperCase() + type.slice(1)}
