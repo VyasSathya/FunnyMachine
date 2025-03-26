@@ -1,6 +1,6 @@
 :root {
   --primary: #3b82f6;
-  --background: #fce4ec; /* A nice pastel pink */
+  --background: #fce4ec; /* Pastel pink */
   --surface: #ffffff;
   --border: #e2e8f0;
   --text-primary: #1e293b;
@@ -16,18 +16,31 @@
 .layout {
   display: flex;
   height: 100vh;
+  gap: 1rem;
+  padding: 1rem;
   font-family: 'Inter', -apple-system, sans-serif;
   background: var(--background);
 }
 
-.left-panel, .right-panel {
-  width: 400px;
+/* Left Panel (Library) – enlarged */
+.left-panel {
+  width: 500px;
   padding: 1.5rem;
   background: var(--surface);
   border-right: 1px solid var(--border);
   overflow-y: auto;
 }
 
+/* Right Panel (New Material) */
+.right-panel {
+  width: 400px;
+  padding: 1.5rem;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+/* Middle Panel (Focus view) */
 .middle-panel {
   flex: 1;
   min-width: 500px;
@@ -36,25 +49,29 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  overflow: visible;
 }
 
+/* Library Items */
+.library-item {
+  padding: 8px;
+  margin: 4px 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--surface);
+  transition: background 0.2s;
+}
+
+.library-item:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Blocks & Drop Indicators */
 .block-container {
   position: relative;
-}
-
-.insert-indicator {
-  height: 2px;
-  background: var(--primary);
-  margin: 4px 24px;
-  opacity: 0;
-  transition: opacity 0.2s;
-  position: absolute;
-  left: 0;
-  right: 0;
-}
-
-.block-container.drag-over .insert-indicator {
-  opacity: 1;
+  margin: 8px 0;
 }
 
 .block {
@@ -63,8 +80,11 @@
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  cursor: grab;
+  position: relative;
+  z-index: 2;
 }
 
 .block:hover {
@@ -98,12 +118,60 @@
   padding: 0.25rem;
   opacity: 0.5;
   transition: opacity 0.2s;
+  font-size: 0.9rem;
+  color: #c00;
 }
 
 .remove-btn:hover {
   opacity: 1;
 }
 
+/* Drop Indicator Styling */
+.insert-indicator {
+  height: 2px;
+  background: var(--primary);
+  margin: 4px 24px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #fff;
+}
+
+.block-container.drag-over .insert-indicator {
+  opacity: 1;
+}
+
+.insert-indicator.before {
+  top: -2px;
+}
+
+.insert-indicator.after {
+  bottom: -2px;
+}
+
+.insert-indicator.nest {
+  left: 24px;
+  right: 24px;
+  height: 4px;
+  background: #94a3b8;
+  opacity: 0.3;
+}
+
+/* Error Message Styling – positioned with a top margin so it appears below prior content */
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Tab Buttons and Content */
 .tab-buttons {
   display: flex;
   gap: 0.5rem;
@@ -122,7 +190,7 @@
 
 .tab-buttons button.active {
   background: var(--primary);
-  color: white;
+  color: #fff;
   border-color: transparent;
 }
 
@@ -146,22 +214,7 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.error-message {
-  background: #fee2e2;
-  color: #dc2626;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-}
-
-.focus-placeholder {
-  padding: 2rem;
-  text-align: center;
-  color: #94a3b8;
-  border: 2px dashed var(--border);
-  border-radius: 12px;
-}
-
+/* Input Section */
 .input-section {
   display: flex;
   flex-direction: column;
@@ -181,7 +234,7 @@
 .input-section button {
   padding: 0.875rem;
   background: var(--primary);
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -207,39 +260,4 @@
 
 .refresh-btn:hover {
   background: var(--background);
-}
-
-.insert-indicator.before {
-  top: -2px;
-}
-
-.insert-indicator.after {
-  bottom: -2px;
-}
-
-.insert-indicator.nest {
-  left: 24px;
-  right: 24px;
-  height: 4px;
-  background: #94a3b8;
-  opacity: 0.3;
-}
-
-.block-container.drag-over.nest .insert-indicator.nest {
-  opacity: 1;
-}
-
-/* Add these rules */
-.middle-panel {
-  overflow: visible; /* Changed from default */
-}
-
-.nested-blocks {
-  position: relative;
-  z-index: 1;
-}
-
-.block {
-  position: relative;
-  z-index: 2;
 }

@@ -3,6 +3,7 @@ import "./App.css";
 import libraryData from "./mockData/library";
 import BlockComponent from "./components/BlockComponent";
 
+// Finds the parent of the node with targetId
 function findParent(root, targetId, parent = null) {
   if (root.id === targetId) return parent;
   if (root.children) {
@@ -14,6 +15,7 @@ function findParent(root, targetId, parent = null) {
   return null;
 }
 
+// Removes a node with targetId from its parent's children
 function removeFromParent(root, targetId) {
   const parent = findParent(root, targetId);
   if (parent?.children) {
@@ -21,12 +23,16 @@ function removeFromParent(root, targetId) {
   }
 }
 
-function calculateDepth(node, currentDepth = 0) {
-  if (currentDepth >= 5) return currentDepth; // Hard limit
-  if (!node.children || node.children.length === 0) return currentDepth;
-  return Math.max(...node.children.map(child => 
-    calculateDepth(child, currentDepth + 1)
-  ));
+// Computes the level (depth) of a node relative to the focus tree root
+function computeLevel(root, targetId, currentLevel = 0) {
+  if (root.id === targetId) return currentLevel;
+  if (root.children) {
+    for (const child of root.children) {
+      const level = computeLevel(child, targetId, currentLevel + 1);
+      if (level !== -1) return level;
+    }
+  }
+  return -1;
 }
 
 const validParentChildTypes = {
@@ -52,7 +58,6 @@ export default function App() {
   const [lastError, setLastError] = useState("");
   const [history, setHistory] = useState([]);
   const [future, setFuture] = useState([]);
-  const [currentState, setCurrentState] = useState(null);
 
   // Initial load from localStorage
   useEffect(() => {
@@ -129,16 +134,16 @@ export default function App() {
     setHistory(prev => [...prev, future[0]]);
   };
 
-  // ─── Nesting Handler (used in the builder tab only) ─────────────
+  // ─── Nesting Handler (for nesting dragged elements) ─────────────
   const handleDropIntoChild = (e, targetItem) => {
     e.preventDefault();
     const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
     
-    // Clone the focus tree so we don’t mutate state directly
+    // Clone the focus tree to avoid direct mutation
     const updatedFocus = structuredClone(focusItem);
     removeFromParent(updatedFocus, draggedItem.id);
     
-    // Find the target node
+    // Find the target node in the updated tree
     const findNode = (node, id) => {
       if (node.id === id) return node;
       if (node.children) {
@@ -163,6 +168,7 @@ export default function App() {
       return;
     }
     
+    // Prevent circular references
     const checkCircular = (node, id) => {
       if (node.id === id) return true;
       if (node.children) {
@@ -176,8 +182,10 @@ export default function App() {
       return;
     }
     
-    const currentDepth = calculateDepth(actualNewParent);
-    if (currentDepth >= 3 && draggedItem.type === 'bit') {
+    // Compute new level for the dragged item based on its intended parent
+    const parentLevel = computeLevel(updatedFocus, actualNewParent.id);
+    const newChildLevel = parentLevel + 1;
+    if (draggedItem.type === 'bit' && newChildLevel > 3) {
       setLastError("Maximum bit nesting depth (3) reached!");
       setTimeout(() => setLastError(""), 3000);
       return;
@@ -189,13 +197,15 @@ export default function App() {
     setFocusItem(updatedFocus);
   };
 
-  // ─── Reorder Handler (used for reordering siblings) ─────────────
+  // ─── Reorder Handler (for moving elements within the same container) ─────────────
   const handleReorder = (e, parentItem, dropIndex) => {
     e.preventDefault();
     const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
+    
+    // Clone the focus tree to work on
     const updatedFocus = structuredClone(focusItem);
 
-    // Find the parent node in the updated focus tree
+    // Helper to find a node by id in the tree
     const findNode = (node, id) => {
       if (node.id === id) return node;
       if (node.children) {
@@ -213,25 +223,22 @@ export default function App() {
       setTimeout(() => setLastError(""), 3000);
       return;
     }
+    
+    // Find the current index of the dragged item
     const currentIndex = targetParent.children.findIndex(child => child.id === draggedItem.id);
     if (currentIndex === -1) {
       setLastError("Item not found in the target container");
       setTimeout(() => setLastError(""), 3000);
       return;
     }
-    // Prevent reordering that accidentally nests: only allow same-level moves
-    if (parentItem.id !== findParent(updatedFocus, draggedItem.id)?.id) {
-      setLastError("Reordering must be within the same container");
-      setTimeout(() => setLastError(""), 3000);
-      return;
-    }
-    // Remove the dragged item and insert it at the new index
+
+    // Remove the dragged item from its current position
     const [itemToMove] = targetParent.children.splice(currentIndex, 1);
-    if (dropIndex < 0 || dropIndex > targetParent.children.length) {
-      targetParent.children.push(itemToMove);
-    } else {
-      targetParent.children.splice(dropIndex, 0, itemToMove);
-    }
+
+    // Clamp the dropIndex to be within valid bounds
+    const clampedIndex = Math.max(0, Math.min(dropIndex, targetParent.children.length));
+    targetParent.children.splice(clampedIndex, 0, itemToMove);
+    
     setFocusItem(updatedFocus);
   };
 
@@ -254,14 +261,14 @@ export default function App() {
 
   const categories = ["special", "set", "bit", "joke", "idea"];
 
-  // ─── Helper functions for tab content ─────────────────────────────
+  // ─── Render for the Builder Tab ─────────────────────────────
   const renderBuilderTab = () => (
     focusItem ? (
       <div className="builder-area drop-zone">
         {/*
-          In your BlockComponent, add dedicated drop zones for reordering.
-          For example, between each sibling block render an element that calls
-          handleReorder with the parent and the intended drop index.
+          BlockComponent is expected to render its children with appropriate
+          drop zones for reordering and nesting. It will call handleReorder and
+          handleDropIntoChild as needed.
         */}
         <BlockComponent
           item={focusItem}
@@ -269,7 +276,7 @@ export default function App() {
           onDropChild={handleDropIntoChild}
           onRemoveChild={handleRemoveChild}
           onDragStart={handleDragStart}
-          onReorder={handleReorder} // Pass to allow reordering drop zones
+          onReorder={handleReorder}
         />
       </div>
     ) : (
@@ -287,7 +294,6 @@ export default function App() {
     printItem(focusItem, 0);
     return <pre className="bit-text-readout">{lines.join("\n")}</pre>;
   };
-  // ─────────────────────────────────────────────────────────────────────
 
   return (
     <div className="layout">
@@ -329,10 +335,6 @@ export default function App() {
           {lastError && <div className="error-message">⚠️ {lastError}</div>}
         </div>
         
-        {/* 
-          Restore the duplicate focus view exactly as before—this shows only the top-level block,
-          with no nesting functionality.
-        */}
         <div 
           className="focus-bar drop-zone"
           onDragOver={(e) => e.preventDefault()}
@@ -380,7 +382,6 @@ export default function App() {
             placeholder="Paste/type new material here..."
             rows={6}
           />
-          {/* Re-added and organized input buttons */}
           <div className="input-buttons" style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
             <button>🎙️ Record</button>
             <button>📁 Upload</button>
