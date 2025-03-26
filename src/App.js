@@ -48,6 +48,15 @@ function canNest(parentType, childType) {
   return validParentChildTypes[parentType]?.includes(childType) ?? false;
 }
 
+// Color mapping for uniform library item backgrounds and blocks
+const typeColors = {
+  special: "#ffadad", // light red
+  set: "#ffd6a5",     // light orange
+  bit: "#fdffb6",     // light yellow
+  joke: "#caffbf",    // light green
+  idea: "#9bf6ff"     // light blue
+};
+
 export default function App() {
   const [library, setLibrary] = useState([]);
   const [activeLibCategory, setActiveLibCategory] = useState("joke");
@@ -265,7 +274,7 @@ export default function App() {
   const renderBuilderTab = () => (
     focusItem ? (
       <div className="builder-area drop-zone">
-        {/*
+        {/* 
           BlockComponent is expected to render its children with appropriate
           drop zones for reordering and nesting. It will call handleReorder and
           handleDropIntoChild as needed.
@@ -294,6 +303,7 @@ export default function App() {
     printItem(focusItem, 0);
     return <pre className="bit-text-readout">{lines.join("\n")}</pre>;
   };
+  
 
   return (
     <div className="layout">
@@ -320,6 +330,8 @@ export default function App() {
                 draggable
                 onDragStart={(e) => handleDragStart(e, item)}
                 onClick={() => setFocusItem(structuredClone(item))}
+                // Apply uniform background based on item type
+                style={{ backgroundColor: typeColors[item.type] || "#fff" }}
               >
                 {item.label || item.text}
               </div>
@@ -331,10 +343,6 @@ export default function App() {
       </div>
 
       <div className="middle-panel">
-        <div className="error-banner">
-          {lastError && <div className="error-message">⚠️ {lastError}</div>}
-        </div>
-        
         <div 
           className="focus-bar drop-zone"
           onDragOver={(e) => e.preventDefault()}
@@ -372,6 +380,9 @@ export default function App() {
             {activeTab === "tags" && <div>Tags for {focusItem?.label}</div>}
           </div>
         </div>
+
+        {/* Error message moved to the bottom of the middle panel */}
+        {lastError && <div className="error-message">⚠️ {lastError}</div>}
       </div>
 
       <div className="right-panel">

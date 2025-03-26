@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-// Define a color for each type
+// Uniform colors by type.
 const typeColors = {
   special: "#ffadad", // light red
   set: "#ffd6a5",     // light orange
@@ -11,19 +11,19 @@ const typeColors = {
 
 const BlockComponent = ({ item, level, onDropChild, onRemoveChild, onDragStart, parent }) => {
   const [insertPosition, setInsertPosition] = useState(null);
-  const blockBg = typeColors[item.type] || "#fff"; // Use color from mapping or fallback white
+  const blockBg = typeColors[item.type] || "#fff"; // Uniform background by type
 
-  // Determine drop indicator based on pointer vertical position
+  // Determine drop indicator based on pointer vertical position.
   const handleDragOver = (e) => {
     e.preventDefault();
     const rect = e.currentTarget.getBoundingClientRect();
     const offsetY = e.clientY - rect.top;
     if (offsetY < rect.height * 0.4) {
-      setInsertPosition('before');
+      setInsertPosition("before");
     } else if (offsetY > rect.height * 0.6) {
-      setInsertPosition('after');
+      setInsertPosition("after");
     } else {
-      setInsertPosition('nest');
+      setInsertPosition("nest");
     }
   };
 
@@ -34,13 +34,13 @@ const BlockComponent = ({ item, level, onDropChild, onRemoveChild, onDragStart, 
   };
 
   return (
-    <div 
+    <div
       className="block-container"
       onDragOver={handleDragOver}
       onDragLeave={() => setInsertPosition(null)}
       onDrop={handleDrop}
     >
-      {insertPosition === 'before' && (
+      {insertPosition === "before" && (
         <div className="insert-indicator before">Drop here to move above</div>
       )}
 
@@ -52,8 +52,8 @@ const BlockComponent = ({ item, level, onDropChild, onRemoveChild, onDragStart, 
       >
         <div className="block-header">
           <strong>{item.label}</strong>
-          <button 
-            className="remove-btn" 
+          <button
+            className="remove-btn"
             onClick={() => onRemoveChild(item)}
             aria-label="Remove item"
           >
@@ -66,11 +66,11 @@ const BlockComponent = ({ item, level, onDropChild, onRemoveChild, onDragStart, 
         </div>
       </div>
 
-      {insertPosition === 'nest' && (
+      {insertPosition === "nest" && (
         <div className="insert-indicator nest">Drop here to nest</div>
       )}
 
-      {item.children?.map((child) => (
+      {item.children?.map(child => (
         <BlockComponent
           key={child.id}
           item={child}
@@ -82,7 +82,7 @@ const BlockComponent = ({ item, level, onDropChild, onRemoveChild, onDragStart, 
         />
       ))}
 
-      {insertPosition === 'after' && (
+      {insertPosition === "after" && (
         <div className="insert-indicator after">Drop here to move below</div>
       )}
     </div>

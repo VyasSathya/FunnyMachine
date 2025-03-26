@@ -1,10 +1,12 @@
 :root {
   --primary: #3b82f6;
-  --background: #fce4ec; /* Pastel pink */
+  --background: #fce4ec;  /* Pastel pink background */
   --surface: #ffffff;
   --border: #e2e8f0;
   --text-primary: #1e293b;
   --text-secondary: #475569;
+  --side-bg: #e0f7fa;      /* Light pastel blue for side panels */
+  --serif: 'Georgia', serif;
 }
 
 * {
@@ -13,34 +15,36 @@
   padding: 0;
 }
 
+body {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  background: var(--background);
+}
+
 .layout {
   display: flex;
   height: 100vh;
   gap: 1rem;
   padding: 1rem;
-  font-family: 'Inter', -apple-system, sans-serif;
-  background: var(--background);
 }
 
-/* Left Panel (Library) – enlarged */
+.left-panel,
+.right-panel {
+  padding: 1.5rem;
+  background: var(--side-bg);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+}
+
 .left-panel {
   width: 500px;
-  padding: 1.5rem;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  overflow-y: auto;
 }
 
-/* Right Panel (New Material) */
 .right-panel {
   width: 400px;
-  padding: 1.5rem;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  overflow-y: auto;
 }
 
-/* Middle Panel (Focus view) */
 .middle-panel {
   flex: 1;
   min-width: 500px;
@@ -52,29 +56,140 @@
   overflow: visible;
 }
 
-/* Library Items */
-.library-item {
-  padding: 8px;
-  margin: 4px 0;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  cursor: pointer;
-  background: var(--surface);
-  transition: background 0.2s;
+/* Headings for panels */
+.left-panel h2,
+.middle-panel h3,
+.right-panel h2 {
+  font-family: var(--serif);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  color: var(--text-primary);
 }
 
-.library-item:hover {
+/* Library Items & Tabs (clickable) */
+.library-item,
+.tab {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.library-item:hover,
+.tab:hover {
+  transform: translateX(4px);
+}
+
+/* Tab Buttons */
+.tab-buttons button {
+  flex: 1;
+  margin: 0.25rem;
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  color: var(--text-primary);
+}
+
+.tab-buttons button.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+.tab-buttons button:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* General Button Styling */
+button, .button {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  color: var(--text-primary);
+  margin: 0.5rem 0;
+}
+
+button:hover, .button:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Focused Material Block Styling */
+.focus-bar h3 {
+  font-family: var(--serif);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Input Section Styling */
+.input-section input,
+.input-section select,
+.input-section textarea {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 100%;
+}
+
+/* Refresh Button */
+.refresh-btn {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  padding: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.refresh-btn:hover {
   background: var(--primary);
   color: #fff;
 }
 
-/* Blocks & Drop Indicators */
+/* Error Message Styling */
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: auto;
+  margin-bottom: 1rem;
+  font-family: var(--serif);
+  font-size: 1.2rem;
+}
+
+/* Block & Drop Indicators Styling */
 .block-container {
   position: relative;
   margin: 8px 0;
 }
 
 .block {
+  font-family: var(--serif);
+  font-size: 1.2rem;
   padding: 1.5rem;
   margin: 0.5rem 0;
   border-radius: 12px;
@@ -161,103 +276,16 @@
   opacity: 0.3;
 }
 
-/* Error Message Styling – positioned with a top margin so it appears below prior content */
-.error-message {
-  background: #fee2e2;
-  color: #dc2626;
-  padding: 1rem;
+.bit-text-readout {
+  background: #fffaf0;  /* A very light, warm pastel background */
+  padding: 2rem;
   border-radius: 8px;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
-/* Tab Buttons and Content */
-.tab-buttons {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.tab-buttons button {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.tab-buttons button.active {
-  background: var(--primary);
-  color: #fff;
-  border-color: transparent;
-}
-
-.tabs {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.tab {
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: grab;
-  transition: all 0.2s;
-}
-
-.tab:hover {
-  transform: translateX(4px);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-/* Input Section */
-.input-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.input-section input,
-.input-section select,
-.input-section textarea {
-  width: 100%;
-  padding: 0.875rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.input-section button {
-  padding: 0.875rem;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.input-section button:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-}
-
-.refresh-btn {
-  width: 100%;
-  padding: 0.875rem;
-  margin-top: 1rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.refresh-btn:hover {
-  background: var(--background);
-}
