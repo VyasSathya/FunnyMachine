@@ -345,7 +345,7 @@ select optgroup {
   position: relative;
 }
 .block-container.drag-over {
-  /* background-color: #eff6ff6b; */ /* Optional subtle hover */
+  background-color: #eff6ff6b;  /* Optional subtle hover */
 }
 
 .block-content {
