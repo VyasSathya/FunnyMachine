@@ -15,6 +15,10 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env
+*.env
+config/secrets.json
+**/secrets/*
 
 # logs
 npm-debug.log*
