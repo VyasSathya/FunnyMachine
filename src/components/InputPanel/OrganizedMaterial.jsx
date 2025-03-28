@@ -1,125 +1,84 @@
-import React, { useState } from 'react';
-import '../../styles/OrganizedMaterial.css';
+// src/components/InputPanel/OrganizedMaterial.jsx
+import React from 'react';
+import BlockComponent from '../BlockComponent'; // To display the structure
 
-const OrganizedMaterial = ({ organizedResult, onAddToLibrary }) => {
-  const [expandedItems, setExpandedItems] = useState({});
+// Receives the raw organized data { bits: [...], highlights: [...] }, callbacks for save/cancel, and colors
+const OrganizedMaterial = ({ organizedResult, onSave, onCancel, typeColors }) => {
 
-  if (!organizedResult) {
-    return null;
-  }
+    // Basic check if the data structure is as expected
+    if (!organizedResult || !Array.isArray(organizedResult.bits)) {
+        console.error("Invalid organizedResult structure received:", organizedResult);
+        return <div className="error-message">Error: Invalid data received for review.</div>;
+    }
 
-  const toggleExpand = (id) => {
-    setExpandedItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
+    const handleSaveClick = () => {
+        if (typeof onSave === 'function') {
+            // In a real editor, you'd pass back the potentially *edited* data.
+            // For now, we pass back the original organized data.
+            onSave(organizedResult);
+        } else {
+            console.error("onSave handler is missing from OrganizedMaterial props.");
+        }
+    };
 
-  // Render a nested item in the organized structure
-  const renderNestedItem = (item, depth = 0) => {
-    const isExpanded = expandedItems[item.id] || false;
-    const hasChildren = item.children && item.children.length > 0;
+    const handleCancelClick = () => {
+        if (typeof onCancel === 'function') {
+            onCancel();
+        } else {
+            console.error("onCancel handler is missing from OrganizedMaterial props.");
+        }
+    }
 
     return (
-      <div 
-        key={item.id} 
-        className="org-item"
-        style={{ marginLeft: `${depth * 16}px` }}
-      >
-        <div className="org-item-header">
-          {hasChildren && (
-            <button 
-              className={`expand-btn ${isExpanded ? 'expanded' : ''}`}
-              onClick={() => toggleExpand(item.id)}
-            >
-              {isExpanded ? '▼' : '►'}
-            </button>
-          )}
-          
-          <div className="org-item-type">{item.type}</div>
-          <div className="org-item-title">{item.title || item.label || item.text}</div>
-          
-          <button 
-            className="add-library-btn"
-            onClick={() => onAddToLibrary(item)}
-          >
-            Add
-          </button>
-        </div>
-        
-        {hasChildren && isExpanded && (
-          <div className="org-item-children">
-            {item.children.map(child => renderNestedItem(child, depth + 1))}
-          </div>
-        )}
-      </div>
-    );
-  };
+        <div className="organized-material-review">
+            <h4>Review Organized Content</h4>
+            <p>Review the bits and jokes identified by the AI. (Editing/Highlighting UI not implemented yet).</p>
 
-  // Determine if the result is a single item or a nested structure
-  const isSingleItem = !organizedResult.children || organizedResult.children.length === 0;
+             {/* Display AI highlights/suggestions if present */}
+             {organizedResult.highlights && organizedResult.highlights.length > 0 && (
+                 <div className="ai-highlights" style={{marginBottom: '15px', padding: '10px', background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: '4px'}}>
+                     <h5>AI Suggestions:</h5>
+                     <ul style={{margin: 0, paddingLeft: '20px', fontSize: '0.9em'}}>
+                        {organizedResult.highlights.map((h, i) => (
+                            <li key={i}>Consider reviewing section near "{h.textSnippet || '...'}" (Reason: {h.reason || 'N/A'})</li>
+                         ))}
+                     </ul>
+                 </div>
+             )}
 
-  return (
-    <div className="organized-result">
-      <h3>AI Analysis Result</h3>
-      
-      {isSingleItem ? (
-        // Render a single item result (like just a joke)
-        <div className="org-single-item">
-          <div className="org-item-header">
-            <div className="org-item-type">{organizedResult.type}</div>
-            <div className="org-item-title">{organizedResult.title || organizedResult.label || organizedResult.text}</div>
-          </div>
-          
-          {organizedResult.type === 'joke' && (
-            <div className="org-joke-content">
-              <div className="setup">
-                <label>Setup:</label>
-                <p>{organizedResult.setup}</p>
-              </div>
-              <div className="punchline">
-                <label>Punchline:</label>
-                <p>{organizedResult.punchline}</p>
-              </div>
+            {/* Display the structured bits using BlockComponent (non-interactive version) */}
+            <div className="organized-preview">
+                {organizedResult.bits.length > 0 ? (
+                    organizedResult.bits.map(bit => (
+                        <BlockComponent
+                            key={bit.id || `review-bit-${Math.random()}`} // Use provided ID or generate temp key
+                            item={bit}
+                            level={0}
+                            typeColors={typeColors}
+                            // Pass empty/dummy handlers to disable DnD/Remove in preview
+                            onDropChild={() => {}}
+                            onRemoveChild={() => {}}
+                            onDragStart={(e) => e.preventDefault()}
+                            onReorder={() => {}}
+                            parent={null}
+                        />
+                    ))
+                ) : (
+                    <p>No bits/jokes were identified in the text.</p>
+                )}
             </div>
-          )}
-          
-          <div className="org-item-metrics">
-            {organizedResult.technique && (
-              <div className="metric">
-                <label>Technique:</label>
-                <span>{organizedResult.technique}</span>
-              </div>
-            )}
-            
-            {organizedResult.economy && (
-              <div className="metric">
-                <label>Word Economy:</label>
-                <span>{organizedResult.economy}%</span>
-              </div>
-            )}
-          </div>
-          
-          <div className="org-item-actions">
-            <button 
-              className="add-library-btn"
-              onClick={() => onAddToLibrary(organizedResult)}
-            >
-              Add to Library
-            </button>
-            <button className="refine-btn">
-              Refine
-            </button>
-          </div>
+
+            {/* Action Buttons */}
+            <div className="review-actions" style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
+                <button className="btn blue-btn" onClick={handleSaveClick}>
+                    Save to Library
+                </button>
+                <button className="btn" onClick={handleCancelClick}>
+                    Cancel / Discard
+                </button>
+            </div>
         </div>
-      ) : (
-        // Render a nested structure (bit with jokes, etc.)
-        <div className="org-nested-structure">
-          {renderNestedItem(organizedResult)}
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default OrganizedMaterial;

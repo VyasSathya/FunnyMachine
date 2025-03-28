@@ -1,498 +1,324 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
-import libraryData from "./mockData/library";
-import BlockComponent from "./components/BlockComponent";
+import libraryData from "./mockData/library"; // Assuming './mockData/library.js' exists
+import BlockComponent from "./components/BlockComponent.jsx";
+import MediaUpload from "./components/MediaUpload.jsx";
+import OrganizedMaterialEditor from "./components/InputPanel/OrganizedMaterialEditor.jsx"; // Renamed for clarity
+import PunchlineOptimizer from './components/Tools/PunchlineOptimizer';
 
-// Utility functions for tree operations
-function findParent(root, targetId, parent = null) {
-  if (root.id === targetId) return parent;
-  if (root.children) {
-    for (const child of root.children) {
-      const result = findParent(child, targetId, root);
-      if (result) return result;
-    }
-  }
-  return null;
-}
-
-function removeFromParent(root, targetId) {
-  const parent = findParent(root, targetId);
-  if (parent?.children) {
-    parent.children = parent.children.filter(child => child.id !== targetId);
-  }
-}
-
-function computeLevel(root, targetId, currentLevel = 0) {
-  if (root.id === targetId) return currentLevel;
-  if (root.children) {
-    for (const child of root.children) {
-      const level = computeLevel(child, targetId, currentLevel + 1);
-      if (level !== -1) return level;
-    }
-  }
-  return -1;
-}
-
-const validParentChildTypes = {
-  special: ['set'],
-  set: ['bit'],
-  bit: ['joke', 'bit'],
-  joke: ['idea'],
-  idea: ['idea']
+// --- Constants ---
+const availableModels = [ "gpt-4", "gpt-3.5-turbo", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "gemini-pro" ];
+const improvementActionsConfig = {
+  joke: ["Punchline Optimizer", "Tag Generator"],
+  bit: ["Flow Analyzer"],
 };
-
-function canNest(parentType, childType) {
-  if (childType === 'idea') return true;
-  return validParentChildTypes[parentType]?.includes(childType) ?? false;
-}
-
+const categories = ["special", "set", "bit", "joke", "idea"];
 const typeColors = {
-  special: "#ffadad",
-  set: "#ffd6a5",
-  bit: "#fdffb6",
-  joke: "#caffbf",
-  idea: "#9bf6ff"
+  special: "#fecaca", set: "#fed7aa", bit: "#fde68a",
+  joke: "#bbf7d0", idea: "#bfdbfe", default: "#e5e7eb"
+};
+const validParentChildTypes = {
+  special: ['set'], set: ['bit'], bit: ['joke', 'bit'], joke: ['idea'], idea: ['idea']
 };
 
-// Define improvement buttons for each type
-const improvementButtonsByType = {
-  joke: ["Polish", "Tweak", "Revamp", "Boost"],
-  bit: ["Enhance", "Refine", "Energize", "Spark"],
-  set: ["Elevate", "Optimize", "Augment", "Inspire"],
-  special: ["Enrich", "Amplify", "Refine", "Ignite"],
-  idea: ["Polish", "Tweak", "Revamp", "Boost"]
-};
+// --- Utility Functions ---
+// Ensure these are complete and correct
+function findParent(root, targetId, parent = null) { if (!root) return null; if (root.id === targetId) return parent; if (root.children) { for (const c of root.children) { const f = findParent(c, targetId, root); if (f) return f; } } return null; }
+function removeFromParent(root, targetId) { if (!root) return false; if (root.children) { const l = root.children.length; root.children = root.children.filter(c => c.id !== targetId); if (root.children.length < l) return true; for (const c of root.children) { if (removeFromParent(c, targetId)) return true; } } return false; }
+const findNode = (node, id) => { if (!node) return null; if (node.id === id) return node; if (node.children) { for (const c of node.children) { const f = findNode(c, id); if (f) return f; } } return null; };
+function computeLevel(root, targetId, currentLevel = 0) { if (!root) return -1; if (root.id === targetId) return currentLevel; if (root.children) { for (const c of root.children) { const l = computeLevel(c, targetId, currentLevel + 1); if (l !== -1) return l; } } return -1; }
+function canNest(pT, cT) { if (!pT) return false; const a = validParentChildTypes[pT]; if (!a || !a.includes(cT)) { console.warn(`Nesting Check Failed: ${cT} in ${pT}`); return false; } return true; }
+const checkCircular = (n, tId) => { if (!n) return false; if (n.id === tId) return true; if (n.children) { return n.children.some(c => checkCircular(c, tId)); } return false; };
+const generateId = (prefix = 'item') => `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
+// --- Component Definition ---
 export default function App() {
-  // Library and focus states
+  const defaultModel = availableModels.length > 0 ? availableModels[0] : "default-model-placeholder";
+  // --- State ---
   const [library, setLibrary] = useState([]);
   const [activeLibCategory, setActiveLibCategory] = useState("joke");
   const [focusItem, setFocusItem] = useState(null);
-
-  // Tab state; initial active tab is "builder"
-  const [activeTab, setActiveTab] = useState("builder");
-
-  // New material state
-  const [newItemName, setNewItemName] = useState("");
-  const [newItemType, setNewItemType] = useState("joke");
-
+  const [activeMainTab, setActiveMainTab] = useState("builder");
+  const [analysisMode, setAnalysisMode] = useState(false);
+  const [selectedAnalysisModel, setSelectedAnalysisModel] = useState(defaultModel);
+  const [activeAiAction, setActiveAiAction] = useState(null);
+  // Removed aiActionResults as results are handled within tools like PunchlineOptimizer
+  const [rightPanelTab, setRightPanelTab] = useState('process');
+  const [transcriptionText, setTranscriptionText] = useState("");
+  const [organizedResultForReview, setOrganizedResultForReview] = useState(null);
+  const [isOrganizing, setIsOrganizing] = useState(false);
+  const [newIdeaText, setNewIdeaText] = useState("");
   const [lastError, setLastError] = useState("");
-  const [history, setHistory] = useState([]);
-  const [future, setFuture] = useState([]);
 
-  // AI-related state
-  // selectedModel: when empty (""), no model is selected.
-  // We also control the visibility of the dropdown via a flag.
-  const [selectedModel, setSelectedModel] = useState("");
-  const [showAIDropdown, setShowAIDropdown] = useState(true); // true initially
+  // --- Effects ---
+   useEffect(() => { // Load initial data
+     const savedFocus = localStorage.getItem("comedyFocusItem");
+     const savedLibrary = localStorage.getItem("comedyLibrary");
+     try {
+         if (savedFocus) setFocusItem(JSON.parse(savedFocus));
+         setLibrary(savedLibrary ? JSON.parse(savedLibrary) : libraryData);
+     } catch (error) { console.error("Load Err",e);localStorage.clear();setLibrary(libraryData); }
+   }, []);
 
-  // When focus item changes, reset AI state and default to showing dropdown.
-  useEffect(() => {
-    if (focusItem) {
-      setActiveTab("builder");
-      setSelectedModel("");
-      setShowAIDropdown(true);
-    }
+   useEffect(() => { // Save library (triggered by library state change)
+       try { if (library && library.length > 0) localStorage.setItem("comedyLibrary", JSON.stringify(library)); } catch(e){console.error("Lib save error",e)}
+   }, [library]);
+
+   useEffect(() => { // Save focus item (triggered by focusItem state change)
+     if (focusItem) {
+       try {
+         const data = JSON.stringify(focusItem);
+         // Basic size check example
+         if (data.length > 4 * 1024 * 1024) { console.warn("Focus item too large."); setLastError("Warning: Item too large to save."); return; }
+         localStorage.setItem("comedyFocusItem", data);
+       } catch (error) { console.error("Focus save",e); setLastError("Focus Save Err");}
+     } else {
+        localStorage.removeItem("comedyFocusItem"); // Clear if focus is null
+     }
+   }, [focusItem]);
+
+  useEffect(() => { // Reset analysis mode when focus item changes
+    setAnalysisMode(false); setActiveAiAction(null);
   }, [focusItem]);
 
-  // Initial load
+  // Auto-switch library tab based ONLY on focusItem change
   useEffect(() => {
-    const savedFocus = localStorage.getItem("comedyFocusItem");
-    const savedLibrary = localStorage.getItem("comedyLibrary");
-    if (savedFocus) setFocusItem(JSON.parse(savedFocus));
-    setLibrary(savedLibrary ? JSON.parse(savedLibrary) : libraryData);
+    // console.log("--- Focus Item Changed ---"); // Debug Log
+    if (focusItem) {
+        // console.log(`Focus Item Type: ${focusItem.type}`); // Debug Log
+        let childCategory = null;
+        switch (focusItem.type) {
+            case 'special': childCategory = 'set'; break;
+            case 'set': childCategory = 'bit'; break;
+            case 'bit': childCategory = 'joke'; break;
+            case 'joke': childCategory = 'idea'; break;
+            case 'idea': childCategory = 'idea'; break; // Keep on idea
+            default: childCategory = activeLibCategory; // Keep current if unknown type
+        }
+        // console.log(`Determined Child Category: ${childCategory}`); // Debug Log
+
+        // Only switch if the determined category is valid and *different*
+        if (childCategory && categories.includes(childCategory)) {
+            if (childCategory !== activeLibCategory) {
+                 // console.log(`Switching Active Library Category to "${childCategory}"`); // Debug Log
+                 setActiveLibCategory(childCategory);
+            }
+            // else { console.log(`Child category "${childCategory}" already active.`); } // Debug Log
+        }
+        // else { console.log(`Invalid child category (${childCategory}), keeping "${activeLibCategory}"`); } // Debug Log
+    }
+    // else { console.log("Focus Item is null."); } // Debug Log
+    // console.log("--- End Focus Change Effect ---");
+  }, [focusItem]); // Only depends on focusItem
+
+  // --- Handlers ---
+
+  // Wrap handlers in useCallback to stabilize references passed down as props
+  const handleDragStart = useCallback((e, item) => {
+     console.log("DnD Start:", item?.id);
+     try { const data = JSON.stringify(item); e.dataTransfer.setData("application/json", data); e.dataTransfer.effectAllowed = "move"; }
+     catch (error) { console.error("Drag start error:", error); setLastError("Drag Err"); }
   }, []);
 
-  // Sync focus item to localStorage and update library
-  useEffect(() => {
-    if (focusItem) {
+  const handleFocusDrop = useCallback((e) => {
+     console.log("DnD Focus Drop");
+     e.preventDefault();
+     try { const data = e.dataTransfer.getData("application/json"); if (!data) { setLastError("Inv Drop"); return; }
+        const droppedItem = JSON.parse(data); if (!focusItem || focusItem.id !== droppedItem.id) { setFocusItem(structuredClone(droppedItem)); setLastError(""); }
+     } catch (error) { console.error("Focus drop error:", error); setLastError("Drop Err"); }
+  }, [focusItem]);
+
+  const handleDropIntoChild = useCallback((e, targetItem) => { // Nesting
+      console.log(`DnD Nest Start: Dropping ON target ${targetItem.id}`);
+      e.preventDefault(); e.stopPropagation();
+      if (!focusItem) { setLastError("No focus item."); return; }
       try {
-        const data = JSON.stringify(focusItem);
-        if (data.length > 500000) {
-          localStorage.removeItem("comedyFocusItem");
-          window.location.reload();
-          return;
-        }
-        localStorage.setItem("comedyFocusItem", data);
-        setLibrary(prevLibrary => {
-          const exists = prevLibrary.some(item => item.id === focusItem.id);
-          const updatedLib = exists
-            ? prevLibrary.map(item => (item.id === focusItem.id ? focusItem : item))
-            : [...prevLibrary, focusItem];
-          localStorage.setItem("comedyLibrary", JSON.stringify(updatedLib));
-          return updatedLib;
-        });
-      } catch (error) {
-        localStorage.removeItem("comedyFocusItem");
-        window.location.reload();
-      }
-    }
+          const draggedItemData = e.dataTransfer.getData("application/json"); if (!draggedItemData) { setLastError("Inv Nest Drop Data"); return; }
+          const draggedItem = JSON.parse(draggedItemData);
+          console.log(`DnD Nest: Dragged item ${draggedItem.id}`);
+          if (draggedItem.id === targetItem.id) { setLastError("Cannot drop onto self."); setTimeout(() => setLastError(""), 3000); return; }
+          if (checkCircular(draggedItem, targetItem.id)) { setLastError("Circular reference."); setTimeout(() => setLastError(""), 3000); return; }
+
+          setFocusItem(currentFocus => {
+              console.log("DnD Nest: Updating focus state...");
+              if (!currentFocus) return null;
+              const updatedFocus = structuredClone(currentFocus);
+              const actualNewParent = findNode(updatedFocus, targetItem.id);
+              if (!actualNewParent) { setLastError("Drop target node NF."); setTimeout(() => setLastError(""), 3000); return currentFocus; }
+
+              if (!canNest(actualNewParent.type, draggedItem.type)) { setLastError(`Cannot nest '${draggedItem.type}' in '${actualNewParent.type}'.`); setTimeout(() => setLastError(""), 3000); return currentFocus; }
+              const parentLevel = computeLevel(updatedFocus, actualNewParent.id);
+              if (draggedItem.type === 'bit' && parentLevel >= 2) { setLastError("Max bit depth."); setTimeout(() => setLastError(""), 3000); return currentFocus; }
+
+              const removed = removeFromParent(updatedFocus, draggedItem.id);
+              console.log(`DnD Nest: remove ${draggedItem.id} result: ${removed}`);
+              if (!removed) { console.warn(`Item ${draggedItem.id} NF for removal.`); }
+
+              if (!actualNewParent.children) actualNewParent.children = [];
+              const clonedDraggedItem = structuredClone(draggedItem);
+              actualNewParent.children.push(clonedDraggedItem);
+              console.log(`DnD Nest: Added ${clonedDraggedItem.id} to ${actualNewParent.id}. New children#: ${actualNewParent.children.length}`);
+
+              setLastError("");
+              console.log("DnD Nest: Update complete.");
+              return updatedFocus;
+          });
+      } catch (error) { console.error("Drop into child error:", error); setLastError("Drop Err."); setTimeout(() => setLastError(""), 3000); }
   }, [focusItem]);
 
-  const handleDragStart = (e, item) => {
-    e.dataTransfer.setData("application/json", JSON.stringify(item));
-  };
+  const handleReorder = useCallback((e, targetParentItem, dropIndex) => { // Reordering
+      console.log(`DnD Reorder Start: Target Parent ${targetParentItem.id}, Index ${dropIndex}`);
+      e.preventDefault(); e.stopPropagation();
+      if (!focusItem) { setLastError("No focus item."); return; }
+      try {
+          const draggedItemData = e.dataTransfer.getData("application/json"); if (!draggedItemData) { setLastError("Inv Reorder Drop Data"); return; }
+          const draggedItem = JSON.parse(draggedItemData);
+          console.log(`DnD Reorder: Dragged item ${draggedItem.id}`);
+          if (draggedItem.id === targetParentItem.id && dropIndex === -1) { setLastError("Cannot reorder self."); return; }
 
-  const handleFocusDrop = (e) => {
-    e.preventDefault();
-    const data = JSON.parse(e.dataTransfer.getData("application/json"));
-    if (!focusItem || focusItem.id !== data.id) {
-      setFocusItem(structuredClone(data));
-    }
-  };
+          setFocusItem(currentFocus => {
+              console.log("DnD Reorder: Updating focus state...");
+              if (!currentFocus) return null;
+              const updatedFocus = structuredClone(currentFocus);
+              const actualTargetParent = findNode(updatedFocus, targetParentItem.id);
+              if (!actualTargetParent) { setLastError("Reorder parent NF."); setTimeout(() => setLastError(""), 3000); return currentFocus; }
+              if (!Array.isArray(actualTargetParent.children)) actualTargetParent.children = [];
 
-  useEffect(() => {
-    if (focusItem) {
-      setHistory(prev => [...prev.slice(-9), focusItem]);
-      setFuture([]);
-    }
+              if (!canNest(actualTargetParent.type, draggedItem.type)) { setLastError(`Cannot place '${draggedItem.type}' in '${actualTargetParent.type}'.`); setTimeout(() => setLastError(""), 3000); return currentFocus; }
+              const targetLevel = computeLevel(updatedFocus, actualTargetParent.id);
+              if (draggedItem.type === 'bit' && targetLevel >= 2) { setLastError("Max bit depth target."); setTimeout(() => setLastError(""), 3000); return currentFocus; }
+
+              const removed = removeFromParent(updatedFocus, draggedItem.id);
+              console.log(`DnD Reorder: remove ${draggedItem.id} result: ${removed}`);
+              if (!removed) { console.warn(`Item ${draggedItem.id} NF for removal reorder.`); }
+
+              const itemToMove = structuredClone(draggedItem);
+              const clampedIndex = Math.max(0, Math.min(dropIndex, actualTargetParent.children.length));
+              actualTargetParent.children.splice(clampedIndex, 0, itemToMove);
+              console.log(`DnD Reorder: Inserted ${itemToMove.id} into ${actualTargetParent.id} at ${clampedIndex}. New children#: ${actualTargetParent.children.length}`);
+
+              setLastError("");
+              console.log("DnD Reorder: Update complete.");
+              return updatedFocus;
+          });
+      } catch (error) { console.error("Reorder error:", error); setLastError("Reorder Err."); setTimeout(() => setLastError(""), 3000); }
   }, [focusItem]);
 
-  const undo = () => {
-    setHistory(prev => {
-      if (prev.length < 2) return prev;
-      const newHistory = [...prev.slice(0, -1)];
-      setFuture(prevFuture => [prev[prev.length - 1], ...prevFuture]);
-      setFocusItem(prev[prev.length - 2]);
-      return newHistory;
-    });
-  };
+   const handleRemoveChild = useCallback((target) => { // Removing item
+     console.log(`Attempt remove: ${target.id}`);
+     if (!focusItem) return;
+     if (focusItem.id === target.id) { if (window.confirm(`⚠️ Remove focus item "${target.label||target.type}"?`)) { setFocusItem(null); setLastError("Focus removed."); setTimeout(()=>setLastError(""),3000); } return; }
+     const nodeToRemove = findNode(focusItem, target.id);
+     const childrenCount = nodeToRemove?.children?.length ?? 0;
+     const msg = `Remove "${target.label||target.type}"${childrenCount > 0 ? ` and ${childrenCount} child(ren)` : ''}?`;
 
-  const redo = () => {
-    if (future.length === 0) return;
-    setFocusItem(future[0]);
-    setFuture(prev => prev.slice(1));
-    setHistory(prev => [...prev, future[0]]);
-  };
+     if (window.confirm(msg)) {
+         console.log(`Confirmed removal for ${target.id}`);
+         setFocusItem(currentFocus => {
+             if (!currentFocus) return null;
+             const updated = structuredClone(currentFocus);
+             const removed = removeFromParent(updated, target.id);
+             if (removed) { console.log(`Removed ${target.id}`); setLastError(""); return updated; }
+             else { console.error(`Failed remove ${target.id}`); setLastError("Not found to remove."); setTimeout(()=>setLastError(""),3000); return currentFocus; }
+         });
+     } else { console.log(`Removal cancelled for ${target.id}`); }
+   }, [focusItem]);
 
-  // Handler for nesting dragged elements
-  const handleDropIntoChild = (e, targetItem) => {
-    e.preventDefault();
-    const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
-    const updatedFocus = structuredClone(focusItem);
-    removeFromParent(updatedFocus, draggedItem.id);
-    const findNode = (node, id) => {
-      if (node.id === id) return node;
-      if (node.children) {
-        for (const child of node.children) {
-          const found = findNode(child, id);
-          if (found) return found;
-        }
-      }
-      return null;
-    };
-    const actualNewParent = findNode(updatedFocus, targetItem.id);
-    if (!actualNewParent) {
-      setLastError("Invalid drop target");
-      setTimeout(() => setLastError(""), 3000);
-      return;
-    }
-    if (!canNest(actualNewParent.type, draggedItem.type)) {
-      setLastError(`${draggedItem.type} cannot nest in ${actualNewParent.type}`);
-      setTimeout(() => setLastError(""), 3000);
-      return;
-    }
-    const checkCircular = (node, id) => {
-      if (node.id === id) return true;
-      if (node.children) {
-        return node.children.some(child => checkCircular(child, id));
-      }
-      return false;
-    };
-    if (checkCircular(draggedItem, actualNewParent.id)) {
-      setLastError("Circular references not allowed!");
-      setTimeout(() => setLastError(""), 3000);
-      return;
-    }
-    const parentLevel = computeLevel(updatedFocus, actualNewParent.id);
-    const newChildLevel = parentLevel + 1;
-    if (draggedItem.type === 'bit' && newChildLevel > 3) {
-      setLastError("Maximum bit nesting depth (3) reached!");
-      setTimeout(() => setLastError(""), 3000);
-      return;
-    }
-    if (!actualNewParent.children) actualNewParent.children = [];
-    actualNewParent.children.push(structuredClone(draggedItem));
-    setFocusItem(updatedFocus);
-  };
+  // Library & Input Handlers
+  const refreshLibrary = () => { if(window.confirm("Reset library?")){ localStorage.clear(); setFocusItem(null); setLibrary(libraryData); setLastError("Lib Reset."); setTimeout(()=>setLastError(""),3000); }};
+  const handleOrganizeText = async () => { if(!transcriptionText.trim()){setLastError("No text");return;} setLastError("Organizing..."); setIsOrganizing(true); setOrganizedResultForReview(null); try{ /* Call backend /api/organize */ await new Promise(r=>setTimeout(r,1000)); const d={bits:[{id:generateId('bit'),type:'bit',label:"AI Bit",children:[{id:generateId('joke'),type:'joke',text:`Joke from ${transcriptionText.substring(0,10)}...`,versions:[]}]}],highlights:[]}; setOrganizedResultForReview(d); setLastError(""); } catch(e){console.error(e);setLastError("Organize Fail"); setOrganizedResultForReview(null); } finally {setIsOrganizing(false);} };
+  const handleSaveOrganized = async (editedData) => { if (!editedData?.bits){setLastError("No data");return;} console.log("Saving organized:", editedData); setLastError("Saving..."); try { await new Promise(r => setTimeout(r, 100)); setLibrary(currentLib => { let uL=[...currentLib]; let jA=[]; let bA=[]; const libMap=new Map(uL.map(i=>[i.id,i])); editedData.bits.forEach(b=>{ const bT={...structuredClone(b), children:[]}; (b.children||[]).forEach(jRef=>{ let jD=jRef; if(!jD.text&&jD.id){const fD=editedData.jokes?.find(j=>j.id===jD.id); if(fD)jD=fD; else{console.warn(`No data for joke ref ${jD.id}`); return;}} if(jD.type==='joke'&&jD.text){ let eId=null; try{ console.log(`Placeholder Sim Check: ${jD.text.substring(0,20)}`);/* Call /api/find-similar-joke */ } catch(e){console.error(e);} if(eId&&libMap.has(eId)){ console.log(`Found existing ${eId}`); const eJ=libMap.get(eId); const nV={id:generateId('ver'),text:jD.text,ts:new Date().toISOString()}; libMap.set(eId,{...eJ,versions:[...(eJ.versions||[]),nV]}); bT.children.push({id:eId,type:'joke'}); } else { const eNJ=jA.find(j=>j.text===jD.text); if(eNJ){ bT.children.push({id:eNJ.id,type:'joke'}); } else { const nJ={...jD,id:jD.id&&!jD.id.startsWith('review-')?jD.id:generateId('joke'),label:`Joke (${jD.text.substring(0,15)}...)`,versions:[]}; jA.push(nJ); libMap.set(nJ.id,nJ); bT.children.push({id:nJ.id,type:'joke'});}} } else if (jRef.type==='bit'){console.warn("Nested bits save NYI");}}); bA.push({...bT,id:bT.id&&!bT.id.startsWith('review-')?bT.id:generateId('bit')}); }); const finalLib=Array.from(libMap.values()); return [...finalLib, ...jA, ...bA]; }); setOrganizedResultForReview(null); setTranscriptionText(""); setLastError("Saved!"); setTimeout(()=>setLastError(""),3000); } catch(e){ console.error(e); setLastError("Save Err");}};
+  const handleAddNewIdea = () => { if(!newIdeaText.trim()){setLastError("No idea text");return;} const nI={id:generateId('idea'),type:'idea',label:`Idea (${newIdeaText.substring(0,20)}...)`,text:newIdeaText,children:[]}; setLibrary(p=>[...p,nI]); setNewIdeaText(""); setLastError("Idea Added."); setTimeout(()=>setLastError(""),3000);};
+  const handleTranscriptionUpload = (data, target) => { console.log("Upload:", data, "Target:", target); if(data?.transcription){ if (target === 'idea') { setNewIdeaText(p => p ? `${p}\n\n${data.transcription}`: data.transcription); } else { setTranscriptionText(p => p ? `${p}\n\n${data.transcription}`: data.transcription); } } setLastError("Upload Ok."); setTimeout(()=>setLastError(""),3000);};
 
-  // Handler for reordering elements
-  const handleReorder = (e, parentItem, dropIndex) => {
-    e.preventDefault();
-    const draggedItem = JSON.parse(e.dataTransfer.getData("application/json"));
-    const updatedFocus = structuredClone(focusItem);
-    const findNode = (node, id) => {
-      if (node.id === id) return node;
-      if (node.children) {
-        for (const child of node.children) {
-          const found = findNode(child, id);
-          if (found) return found;
-        }
-      }
-      return null;
-    };
-    const targetParent = findNode(updatedFocus, parentItem.id);
-    if (!targetParent || !Array.isArray(targetParent.children)) {
-      setLastError("Invalid reorder target");
-      setTimeout(() => setLastError(""), 3000);
-      return;
-    }
-    const currentIndex = targetParent.children.findIndex(child => child.id === draggedItem.id);
-    if (currentIndex === -1) {
-      setLastError("Item not found in the target container");
-      setTimeout(() => setLastError(""), 3000);
-      return;
-    }
-    const [itemToMove] = targetParent.children.splice(currentIndex, 1);
-    const clampedIndex = Math.max(0, Math.min(dropIndex, targetParent.children.length));
-    targetParent.children.splice(clampedIndex, 0, itemToMove);
-    setFocusItem(updatedFocus);
-  };
+  // Analysis Mode Handlers
+  const enterAnalysisMode = () => { if(focusItem){setAnalysisMode(true);setActiveMainTab(null);setActiveAiAction(null);} };
+  const exitAnalysisMode = () => { setAnalysisMode(false);setActiveMainTab('builder');setActiveAiAction(null);};
+  const handleAiActionClick = (actionName) => { setActiveAiAction(actionName);};
 
-  const handleRemoveChild = (target) => {
-    const updated = structuredClone(focusItem);
-    const recurseRemove = (node) => {
-      node.children = node.children?.filter(child => child.id !== target.id);
-      node.children?.forEach(recurseRemove);
-    };
-    recurseRemove(updated);
-    setFocusItem(updated);
-  };
+  // --- Render Functions ---
+  const renderTextTab = () => { if(!focusItem)return<div className="tool-desc">No item</div>; const l=[];const ex=(i)=>{if(!i)return; if(i.text&&(i.type==='joke'||i.type==='bit'))l.push(i.text); i.children?.forEach(ex);}; ex(focusItem); return<pre className="text-readout">{l.join("\n\n")||"(No text)"}</pre>;};
 
-  const refreshLibrary = () => {
-    localStorage.removeItem("comedyFocusItem");
-    localStorage.removeItem("comedyLibrary");
-    setFocusItem(null);
-    setLibrary(libraryData);
-  };
-
-  // Library category buttons
-  const categories = ["special", "set", "bit", "joke", "idea"];
-
-  // Render functions for tab content
-  const renderBuilderTab = () => (
-    focusItem ? (
-      <div className="builder-area drop-zone">
-        <BlockComponent
-          item={focusItem}
-          level={0}
-          onDropChild={handleDropIntoChild}
-          onRemoveChild={handleRemoveChild}
-          onDragStart={handleDragStart}
-          onReorder={handleReorder}
-        />
-      </div>
-    ) : (
-      <div className="tool-desc">Drag/click from library to focus</div>
-    )
-  );
-
-  const renderTextTab = () => {
-    if (!focusItem) return <div className="tool-desc">No focus item</div>;
-    const lines = [];
-    const printItem = (it, depth) => {
-      lines.push("  ".repeat(depth) + "- " + (it.text || it.label));
-      it.children?.forEach(child => printItem(child, depth + 1));
-    };
-    printItem(focusItem, 0);
-    return <pre className="bit-text-readout">{lines.join("\n")}</pre>;
-  };
-
-  // Determine which improvement buttons to show based on focus item type.
-  const improvementButtons = focusItem && improvementButtonsByType[focusItem.type]
-    ? improvementButtonsByType[focusItem.type]
-    : ["Polish", "Tweak", "Revamp", "Boost"];
-
+  // --- Main JSX ---
   return (
     <div className="layout">
-      {/* Left Panel: Library */}
+
+      {/* Left Panel */}
       <div className="left-panel">
         <h2>📚 Library</h2>
-        <div className="tab-buttons">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              className={`btn btn-category ${cat === activeLibCategory ? "active" : ""}`}
-              onClick={() => setActiveLibCategory(cat)}
-            >
-              {cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </button>
-          ))}
+        <div className="tab-buttons category-buttons"> {categories.map(cat => ( <button key={cat} className={`btn btn-category ${cat === activeLibCategory ? "active" : ""}`} onClick={() => setActiveLibCategory(cat)}>{cat.charAt(0).toUpperCase() + cat.slice(1)}s</button> ))} </div>
+        <div className="library-items">
+          {library.filter(item => item.type === activeLibCategory).map(item => ( <button key={item.id} className="btn library-item" style={{ borderLeftColor: typeColors[item.type] || typeColors.default }} draggable onDragStart={(e) => handleDragStart(e, item)} onClick={() => setFocusItem(structuredClone(item)) }>{item.label || '(Untitled)'}</button> )) }
+          {library.filter(item => item.type === activeLibCategory).length === 0 && ( <div className="library-empty">No {activeLibCategory}s.</div> )}
         </div>
-        <div className="tabs">
-          {library
-            .filter(item => item.type === activeLibCategory)
-            .map(item => (
-              <button
-                key={item.id}
-                className="btn tab"
-                style={{ backgroundColor: typeColors[item.type] || "#fff" }}
-                draggable
-                onDragStart={(e) => handleDragStart(e, item)}
-                onClick={() => setFocusItem(structuredClone(item))}
-              >
-                {item.label || item.text}
-              </button>
-            ))}
-        </div>
-        <button className="btn refresh-btn" onClick={refreshLibrary}>
-          🔄 Reset Library
-        </button>
+        <button className="btn refresh-btn" onClick={refreshLibrary}>🔄 Reset Library</button>
       </div>
 
-      {/* Middle Panel: Focused Material & Tab Controls */}
+      {/* Middle Panel */}
       <div className="middle-panel">
-        <div
-          className="focus-bar drop-zone"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={handleFocusDrop}
-        >
-          <h3>🎯 Focused Material</h3>
-          {focusItem ? (
-            <div
-              className="block"
-              draggable
-              onDragStart={(e) => handleDragStart(e, focusItem)}
-            >
-              <strong>{focusItem.label}</strong>
-              <em>{focusItem.text}</em>
-              <div>({focusItem.type})</div>
+        <div className="focus-bar drop-zone" onDragOver={(e) => {e.preventDefault(); e.dataTransfer.dropEffect = "move";}} onDrop={handleFocusDrop}>
+           <h3>🎯 Focused Material</h3>
+           {focusItem ? ( <div className="focus-item-display"> <span><strong>{focusItem.label || '(Untitled)'}</strong> ({focusItem.type})</span> {!analysisMode && ( <button onClick={enterAnalysisMode} className="btn analyze-btn-global">Analyze ✨</button> )} </div> ) : ( <div className="focus-placeholder">Drag item here</div> )}
+        </div>
+        <div className="middle-panel-content">
+          {analysisMode ? (
+            <div className="analysis-view">
+              <div className="analysis-header"> <h3>Analyzing {focusItem?.type}: "{focusItem?.label || 'Untitled'}"</h3> <button onClick={exitAnalysisMode} className="btn back-btn">← Back</button> </div>
+              <div className="analysis-controls">
+                  <label htmlFor="model-select">AI Model:</label>
+                  <select id="model-select" value={selectedAnalysisModel} onChange={(e) => setSelectedAnalysisModel(e.target.value)} className="ai-model-select"> <optgroup label="OpenAI"><option value="gpt-4">GPT-4</option><option value="gpt-3.5-turbo">GPT-3.5-Turbo</option></optgroup> <optgroup label="Anthropic"><option value="claude-3-opus-20240229">Claude 3 Opus</option><option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option></optgroup> <optgroup label="Google"><option value="gemini-pro">Gemini Pro</option></optgroup> </select>
+              </div>
+              <div className="analysis-actions">
+                  {(improvementActionsConfig[focusItem?.type] || []).map(actionName => ( <button key={actionName} className={`btn ai-action-btn ${activeAiAction === actionName ? 'active' : ''}`} onClick={() => handleAiActionClick(actionName)}>{actionName}</button> )) }
+                  {(improvementActionsConfig[focusItem?.type] || []).length === 0 && <p>No analysis actions for '{focusItem?.type}'.</p>}
+              </div>
+              <div className="analysis-results-area">
+                   {activeAiAction === 'Punchline Optimizer' && focusItem && ( <PunchlineOptimizer jokeItem={focusItem} selectedModel={selectedAnalysisModel} /> )}
+                   {/* Add rendering for other tools based on activeAiAction */}
+                   {activeAiAction && activeAiAction !== 'Punchline Optimizer' && ( <div>{activeAiAction} results using {selectedAnalysisModel}... (Tool Component Placeholder)</div> )}
+                   {!activeAiAction && <div className="tool-desc">Select action above.</div>}
+              </div>
             </div>
           ) : (
-            <div className="focus-placeholder">
-              Drag item here to start building
-            </div>
+            <>
+              <div className="tab-buttons-container standard-tabs"> {["builder", "text", "versions"].map(tab => ( <button key={tab} className={`btn tab-btn ${activeMainTab === tab ? "active" : ""}`} onClick={() => setActiveMainTab(tab)}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</button> ))} </div>
+              <div className="tab-content">
+                  {/* Ensure ALL necessary props are passed down to BlockComponent */}
+                  {activeMainTab === 'builder' && ( focusItem ? <div className="builder-area drop-zone"><BlockComponent item={focusItem} level={0} onDropChild={handleDropIntoChild} onRemoveChild={handleRemoveChild} onDragStart={handleDragStart} onReorder={handleReorder} parent={null} typeColors={typeColors} /></div> : <div className="tool-desc">Focus an item</div> )}
+                  {activeMainTab === 'text' && renderTextTab()}
+                  {activeMainTab === 'versions' && <div className="tool-desc">Versions (placeholder)</div>}
+              </div>
+            </>
           )}
         </div>
-        {/* Tab Buttons & AI Controls */}
-        <div className="middle-panel-tools">
-          <div className="tab-buttons-container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div className="tab-buttons-left">
-              {["builder", "text", "versions"].map(tab => (
-                <button
-                  key={tab}
-                  className={tab === activeTab ? "active" : ""}
-                  onClick={() => {
-                    setActiveTab(tab);
-                    // Reset AI state when switching tabs.
-                    setSelectedModel("");
-                    setShowAIDropdown(true);
-                  }}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
-              {/* Render the Analyze button only if activeTab is not "analyze" */}
-              {activeTab !== "analyze" && (
-                <button
-                  onClick={() => {
-                    // When Analyze is clicked, auto-select "Deepseek"
-                    setActiveTab("analyze");
-                    setSelectedModel("Deepseek");
-                    setShowAIDropdown(false);
-                  }}
-                >
-                  Analyze
-                </button>
-              )}
-            </div>
-            <div className="tab-buttons-right">
-              {/* In the initial state (when activeTab is not analyze), show the AI dropdown */}
-              {activeTab !== "analyze" && showAIDropdown && (
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  style={{ padding: "0.5rem", fontSize: "1rem" }}
-                >
-                  <option value="">Select Model</option>
-                  <option value="Deepseek">Deepseek</option>
-                  <option value="O1">O1</option>
-                </select>
-              )}
-              {/* When activeTab is "analyze" and a model is selected, show improvement buttons */}
-              {activeTab === "analyze" && selectedModel && (
-                improvementButtons.map(action => (
-                  <button
-                    key={action}
-                    className={activeTab === action ? "active" : ""}
-                    onClick={() => {
-                      alert(`${action} feature not implemented yet`);
-                      setActiveTab(action);
-                    }}
-                  >
-                    {action}
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-          <div className="tab-content">
-            {activeTab === "builder" && renderBuilderTab()}
-            {activeTab === "text" && renderTextTab()}
-            {activeTab === "versions" && <div>Versions for {focusItem?.label}</div>}
-            {activeTab === "analyze" && (
-              <div className="ai-placeholder">
-                {/* AI analysis content can be integrated here */}
-              </div>
-            )}
-            {["Polish", "Tweak", "Revamp", "Boost", "Enhance", "Refine", "Energize", "Spark", "Elevate", "Optimize", "Augment", "Inspire", "Enrich", "Amplify", "Ignite"].includes(activeTab) && (
-              <div className="ai-placeholder">
-                {/* AI improvement content can be integrated here */}
-              </div>
-            )}
-          </div>
-        </div>
-        {lastError && <div className="error-message">⚠️ {lastError}</div>}
+        {lastError && <div className="error-message" onClick={() => setLastError("")}>⚠️ {lastError}</div>}
       </div>
 
-      {/* Right Panel: New Material */}
+      {/* Right Panel */}
       <div className="right-panel">
-        <h2>➕ New Material</h2>
-        <div className="input-section">
-          <textarea
-            className="transcription-box"
-            placeholder="Paste/type new material here..."
-            rows={6}
-          />
-          <div className="input-buttons" style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-            <button className="btn">🎙️ Record</button>
-            <button className="btn">📁 Upload</button>
-            <button className="btn blue-btn">✨ Organize</button>
-          </div>
-          <input
-            value={newItemName}
-            onChange={(e) => setNewItemName(e.target.value)}
-            placeholder="Enter item name"
-          />
-          <select value={newItemType} onChange={(e) => setNewItemType(e.target.value)}>
-            {categories.map(type => (
-              <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </option>
-            ))}
-          </select>
-          <button
-            className="btn"
-            onClick={() => {
-              if (newItemName.trim()) {
-                setLibrary([
-                  ...library,
-                  {
-                    id: Math.random().toString(36).slice(2),
-                    type: newItemType,
-                    label: newItemName,
-                    text: newItemName,
-                    children: [],
-                  },
-                ]);
-                setNewItemName("");
-              }
-            }}
-          >
-            Add to Library
-          </button>
-        </div>
+        <h2>➕ Input / New</h2>
+        <div className="tab-buttons input-tabs"> <button className={`btn ${rightPanelTab==='process'?'active':''}`} onClick={()=>setRightPanelTab('process')}>Process</button> <button className={`btn ${rightPanelTab==='idea'?'active':''}`} onClick={()=>setRightPanelTab('idea')}>Quick Idea</button> </div>
+        {rightPanelTab === 'process' && (
+            <div className="input-section process-section">
+              <textarea className="transcription-box" placeholder="Paste transcription or type full text..." rows={8} value={transcriptionText} onChange={(e)=>setTranscriptionText(e.target.value)} />
+              <div className="input-buttons"> <button className="btn">🎙️ Record</button> <MediaUpload onUploadComplete={(d)=>handleTranscriptionUpload(d, 'process')} /> <button className="btn blue-btn" onClick={handleOrganizeText} disabled={!transcriptionText.trim()||isOrganizing}>{isOrganizing?'Organizing...':'✨ Organize'}</button> </div>
+              {organizedResultForReview && ( <OrganizedMaterialEditor organizedResult={organizedResultForReview} onSave={handleSaveOrganized} onCancel={()=>setOrganizedResultForReview(null)} typeColors={typeColors} /> )}
+            </div>
+        )}
+        {rightPanelTab === 'idea' && (
+             <div className="input-section idea-section">
+                 <h3>Add Quick Idea</h3>
+                 <textarea className="idea-input-box" placeholder="Jot down premise, observation, punchline, tag..." rows={6} value={newIdeaText} onChange={(e)=>setNewIdeaText(e.target.value)} />
+                 <div className="input-buttons idea-buttons">
+                     <button className="btn">🎙️ Record Idea</button>
+                     {/* Pass 'idea' target to upload handler */}
+                     <MediaUpload onUploadComplete={(d)=>handleTranscriptionUpload(d, 'idea')} />
+                 </div>
+                 <button className="btn" onClick={handleAddNewIdea} disabled={!newIdeaText.trim()}>Add Idea</button>
+             </div>
+        )}
       </div>
-    </div>
+
+    </div> // End Layout
   );
-}
+} // End App Component
