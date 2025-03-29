@@ -1,0 +1,570 @@
+[
+  {
+    "id": "special_chewed_up_hd_20250326_233217",
+    "title": "Chewed_Up_HD_20250326_233217",
+    "description": "Chewed_Up_HD_20250326_233217 comedy special",
+    "set_ids": [
+      "set_chewed_up_hd_20250326_233217"
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.948Z",
+      "last_modified": "2025-03-29T16:51:43.948Z",
+      "status": "released",
+      "target_duration_minutes": 13
+    },
+    "thematic_elements": {
+      "primary_theme": "stand-up",
+      "secondary_themes": [
+        "comedy",
+        "humor"
+      ],
+      "throughlines": [
+        {
+          "concept": "comedy",
+          "manifestations": [
+            "jokes",
+            "bits",
+            "sets"
+          ]
+        }
+      ]
+    },
+    "production_elements": {
+      "opening_style": "direct_address",
+      "closing_style": "callback_to_opening",
+      "staging_notes": "Standard comedy club setup",
+      "tone_shifts": [
+        {
+          "position": 0.2,
+          "tone": "observational"
+        },
+        {
+          "position": 0.5,
+          "tone": "confessional"
+        },
+        {
+          "position": 0.8,
+          "tone": "philosophical"
+        }
+      ]
+    },
+    "analysis": {
+      "narrative_arc": {
+        "stages": []
+      },
+      "identity_evolution": {
+        "starting_persona": "",
+        "transformation_points": [],
+        "ending_persona": ""
+      },
+      "cultural_positioning": {
+        "zeitgeist_relevance": 0.5,
+        "target_demographics": [],
+        "cultural_references": []
+      }
+    },
+    "creative_feedback": {
+      "artistic_cohesion": 0.5,
+      "pacing_assessment": 0.5,
+      "thematic_clarity": 0.5,
+      "suggestions": []
+    }
+  },
+  {
+    "id": "special_hilarious_hd_20250327_041817",
+    "title": "Hilarious_HD_20250327_041817",
+    "description": "Hilarious_HD_20250327_041817 comedy special",
+    "set_ids": [
+      "set_hilarious_hd_20250327_041817"
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.953Z",
+      "last_modified": "2025-03-29T16:51:43.953Z",
+      "status": "released",
+      "target_duration_minutes": 27
+    },
+    "thematic_elements": {
+      "primary_theme": "stand-up",
+      "secondary_themes": [
+        "comedy",
+        "humor"
+      ],
+      "throughlines": [
+        {
+          "concept": "comedy",
+          "manifestations": [
+            "jokes",
+            "bits",
+            "sets"
+          ]
+        }
+      ]
+    },
+    "production_elements": {
+      "opening_style": "direct_address",
+      "closing_style": "callback_to_opening",
+      "staging_notes": "Standard comedy club setup",
+      "tone_shifts": [
+        {
+          "position": 0.2,
+          "tone": "observational"
+        },
+        {
+          "position": 0.5,
+          "tone": "confessional"
+        },
+        {
+          "position": 0.8,
+          "tone": "philosophical"
+        }
+      ]
+    },
+    "analysis": {
+      "narrative_arc": {
+        "stages": []
+      },
+      "identity_evolution": {
+        "starting_persona": "",
+        "transformation_points": [],
+        "ending_persona": ""
+      },
+      "cultural_positioning": {
+        "zeitgeist_relevance": 0.5,
+        "target_demographics": [],
+        "cultural_references": []
+      }
+    },
+    "creative_feedback": {
+      "artistic_cohesion": 0.5,
+      "pacing_assessment": 0.5,
+      "thematic_clarity": 0.5,
+      "suggestions": []
+    }
+  },
+  {
+    "id": "special_live_at_the_beacon_theater_20250327_062436",
+    "title": "Live_at_the_Beacon_Theater_20250327_062436",
+    "description": "Live_at_the_Beacon_Theater_20250327_062436 comedy special",
+    "set_ids": [
+      "set_live_at_the_beacon_theater_20250327_062436"
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.957Z",
+      "last_modified": "2025-03-29T16:51:43.957Z",
+      "status": "released",
+      "target_duration_minutes": 44
+    },
+    "thematic_elements": {
+      "primary_theme": "stand-up",
+      "secondary_themes": [
+        "comedy",
+        "humor"
+      ],
+      "throughlines": [
+        {
+          "concept": "comedy",
+          "manifestations": [
+            "jokes",
+            "bits",
+            "sets"
+          ]
+        }
+      ]
+    },
+    "production_elements": {
+      "opening_style": "direct_address",
+      "closing_style": "callback_to_opening",
+      "staging_notes": "Standard comedy club setup",
+      "tone_shifts": [
+        {
+          "position": 0.2,
+          "tone": "observational"
+        },
+        {
+          "position": 0.5,
+          "tone": "confessional"
+        },
+        {
+          "position": 0.8,
+          "tone": "philosophical"
+        }
+      ]
+    },
+    "analysis": {
+      "narrative_arc": {
+        "stages": []
+      },
+      "identity_evolution": {
+        "starting_persona": "",
+        "transformation_points": [],
+        "ending_persona": ""
+      },
+      "cultural_positioning": {
+        "zeitgeist_relevance": 0.5,
+        "target_demographics": [],
+        "cultural_references": []
+      }
+    },
+    "creative_feedback": {
+      "artistic_cohesion": 0.5,
+      "pacing_assessment": 0.5,
+      "thematic_clarity": 0.5,
+      "suggestions": []
+    }
+  },
+  {
+    "id": "special_live_at_the_comedy_store_hd_20250327_090801",
+    "title": "Live_at_the_Comedy_Store_HD_20250327_090801",
+    "description": "Live_at_the_Comedy_Store_HD_20250327_090801 comedy special",
+    "set_ids": [
+      "set_live_at_the_comedy_store_hd_20250327_090801"
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.969Z",
+      "last_modified": "2025-03-29T16:51:43.969Z",
+      "status": "released",
+      "target_duration_minutes": 71
+    },
+    "thematic_elements": {
+      "primary_theme": "stand-up",
+      "secondary_themes": [
+        "comedy",
+        "humor"
+      ],
+      "throughlines": [
+        {
+          "concept": "comedy",
+          "manifestations": [
+            "jokes",
+            "bits",
+            "sets"
+          ]
+        }
+      ]
+    },
+    "production_elements": {
+      "opening_style": "direct_address",
+      "closing_style": "callback_to_opening",
+      "staging_notes": "Standard comedy club setup",
+      "tone_shifts": [
+        {
+          "position": 0.2,
+          "tone": "observational"
+        },
+        {
+          "position": 0.5,
+          "tone": "confessional"
+        },
+        {
+          "position": 0.8,
+          "tone": "philosophical"
+        }
+      ]
+    },
+    "analysis": {
+      "narrative_arc": {
+        "stages": []
+      },
+      "identity_evolution": {
+        "starting_persona": "",
+        "transformation_points": [],
+        "ending_persona": ""
+      },
+      "cultural_positioning": {
+        "zeitgeist_relevance": 0.5,
+        "target_demographics": [],
+        "cultural_references": []
+      }
+    },
+    "creative_feedback": {
+      "artistic_cohesion": 0.5,
+      "pacing_assessment": 0.5,
+      "thematic_clarity": 0.5,
+      "suggestions": []
+    }
+  },
+  {
+    "id": "special_louis_c_k__at_the_dolby__hd__20250327_112544",
+    "title": "Louis_C.K._at_The_Dolby_(HD)_20250327_112544",
+    "description": "Louis_C.K._at_The_Dolby_(HD)_20250327_112544 comedy special",
+    "set_ids": [
+      "set_louis_c_k__at_the_dolby__hd__20250327_112544"
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.977Z",
+      "last_modified": "2025-03-29T16:51:43.977Z",
+      "status": "released",
+      "target_duration_minutes": 105
+    },
+    "thematic_elements": {
+      "primary_theme": "stand-up",
+      "secondary_themes": [
+        "comedy",
+        "humor"
+      ],
+      "throughlines": [
+        {
+          "concept": "comedy",
+          "manifestations": [
+            "jokes",
+            "bits",
+            "sets"
+          ]
+        }
+      ]
+    },
+    "production_elements": {
+      "opening_style": "direct_address",
+      "closing_style": "callback_to_opening",
+      "staging_notes": "Standard comedy club setup",
+      "tone_shifts": [
+        {
+          "position": 0.2,
+          "tone": "observational"
+        },
+        {
+          "position": 0.5,
+          "tone": "confessional"
+        },
+        {
+          "position": 0.8,
+          "tone": "philosophical"
+        }
+      ]
+    },
+    "analysis": {
+      "narrative_arc": {
+        "stages": []
+      },
+      "identity_evolution": {
+        "starting_persona": "",
+        "transformation_points": [],
+        "ending_persona": ""
+      },
+      "cultural_positioning": {
+        "zeitgeist_relevance": 0.5,
+        "target_demographics": [],
+        "cultural_references": []
+      }
+    },
+    "creative_feedback": {
+      "artistic_cohesion": 0.5,
+      "pacing_assessment": 0.5,
+      "thematic_clarity": 0.5,
+      "suggestions": []
+    }
+  },
+  {
+    "id": "special_oh_my_god__hd__20250327_133344",
+    "title": "Oh_My_God__HD__20250327_133344",
+    "description": "Oh_My_God__HD__20250327_133344 comedy special",
+    "set_ids": [
+      "set_oh_my_god__hd__20250327_133344"
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.982Z",
+      "last_modified": "2025-03-29T16:51:43.982Z",
+      "status": "released",
+      "target_duration_minutes": 144
+    },
+    "thematic_elements": {
+      "primary_theme": "stand-up",
+      "secondary_themes": [
+        "comedy",
+        "humor"
+      ],
+      "throughlines": [
+        {
+          "concept": "comedy",
+          "manifestations": [
+            "jokes",
+            "bits",
+            "sets"
+          ]
+        }
+      ]
+    },
+    "production_elements": {
+      "opening_style": "direct_address",
+      "closing_style": "callback_to_opening",
+      "staging_notes": "Standard comedy club setup",
+      "tone_shifts": [
+        {
+          "position": 0.2,
+          "tone": "observational"
+        },
+        {
+          "position": 0.5,
+          "tone": "confessional"
+        },
+        {
+          "position": 0.8,
+          "tone": "philosophical"
+        }
+      ]
+    },
+    "analysis": {
+      "narrative_arc": {
+        "stages": []
+      },
+      "identity_evolution": {
+        "starting_persona": "",
+        "transformation_points": [],
+        "ending_persona": ""
+      },
+      "cultural_positioning": {
+        "zeitgeist_relevance": 0.5,
+        "target_demographics": [],
+        "cultural_references": []
+      }
+    },
+    "creative_feedback": {
+      "artistic_cohesion": 0.5,
+      "pacing_assessment": 0.5,
+      "thematic_clarity": 0.5,
+      "suggestions": []
+    }
+  },
+  {
+    "id": "special_sincerely_louis_ck_hd_20250327_154256",
+    "title": "Sincerely-Louis-CK-HD_20250327_154256",
+    "description": "Sincerely-Louis-CK-HD_20250327_154256 comedy special",
+    "set_ids": [
+      "set_sincerely_louis_ck_hd_20250327_154256"
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.985Z",
+      "last_modified": "2025-03-29T16:51:43.985Z",
+      "status": "released",
+      "target_duration_minutes": 186
+    },
+    "thematic_elements": {
+      "primary_theme": "stand-up",
+      "secondary_themes": [
+        "comedy",
+        "humor"
+      ],
+      "throughlines": [
+        {
+          "concept": "comedy",
+          "manifestations": [
+            "jokes",
+            "bits",
+            "sets"
+          ]
+        }
+      ]
+    },
+    "production_elements": {
+      "opening_style": "direct_address",
+      "closing_style": "callback_to_opening",
+      "staging_notes": "Standard comedy club setup",
+      "tone_shifts": [
+        {
+          "position": 0.2,
+          "tone": "observational"
+        },
+        {
+          "position": 0.5,
+          "tone": "confessional"
+        },
+        {
+          "position": 0.8,
+          "tone": "philosophical"
+        }
+      ]
+    },
+    "analysis": {
+      "narrative_arc": {
+        "stages": []
+      },
+      "identity_evolution": {
+        "starting_persona": "",
+        "transformation_points": [],
+        "ending_persona": ""
+      },
+      "cultural_positioning": {
+        "zeitgeist_relevance": 0.5,
+        "target_demographics": [],
+        "cultural_references": []
+      }
+    },
+    "creative_feedback": {
+      "artistic_cohesion": 0.5,
+      "pacing_assessment": 0.5,
+      "thematic_clarity": 0.5,
+      "suggestions": []
+    }
+  },
+  {
+    "id": "special_sorry_louis_ck_20250327_174727",
+    "title": "Sorry-Louis-CK_20250327_174727",
+    "description": "Sorry-Louis-CK_20250327_174727 comedy special",
+    "set_ids": [
+      "set_sorry_louis_ck_20250327_174727"
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.992Z",
+      "last_modified": "2025-03-29T16:51:43.992Z",
+      "status": "released",
+      "target_duration_minutes": 232
+    },
+    "thematic_elements": {
+      "primary_theme": "stand-up",
+      "secondary_themes": [
+        "comedy",
+        "humor"
+      ],
+      "throughlines": [
+        {
+          "concept": "comedy",
+          "manifestations": [
+            "jokes",
+            "bits",
+            "sets"
+          ]
+        }
+      ]
+    },
+    "production_elements": {
+      "opening_style": "direct_address",
+      "closing_style": "callback_to_opening",
+      "staging_notes": "Standard comedy club setup",
+      "tone_shifts": [
+        {
+          "position": 0.2,
+          "tone": "observational"
+        },
+        {
+          "position": 0.5,
+          "tone": "confessional"
+        },
+        {
+          "position": 0.8,
+          "tone": "philosophical"
+        }
+      ]
+    },
+    "analysis": {
+      "narrative_arc": {
+        "stages": []
+      },
+      "identity_evolution": {
+        "starting_persona": "",
+        "transformation_points": [],
+        "ending_persona": ""
+      },
+      "cultural_positioning": {
+        "zeitgeist_relevance": 0.5,
+        "target_demographics": [],
+        "cultural_references": []
+      }
+    },
+    "creative_feedback": {
+      "artistic_cohesion": 0.5,
+      "pacing_assessment": 0.5,
+      "thematic_clarity": 0.5,
+      "suggestions": []
+    }
+  }
+]

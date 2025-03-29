@@ -5,11 +5,12 @@ import BlockComponent from "./components/BlockComponent.jsx";
 import MediaUpload from "./components/MediaUpload.jsx";
 import OrganizedMaterialEditor from "./components/InputPanel/OrganizedMaterialEditor.jsx"; // Renamed for clarity
 import PunchlineOptimizer from './components/Tools/PunchlineOptimizer';
+import JokeAnalysis from './components/Analysis/JokeAnalysis'; // Import the JokeAnalysis component
 
 // --- Constants ---
 const availableModels = [ "gpt-4", "gpt-3.5-turbo", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "gemini-pro" ];
 const improvementActionsConfig = {
-  joke: ["Punchline Optimizer", "Tag Generator"],
+  joke: ["Punchline Optimizer", "Joke Analysis", "Tag Generator"], // Added Joke Analysis
   bit: ["Flow Analyzer"],
 };
 const categories = ["special", "set", "bit", "joke", "idea"];
@@ -42,7 +43,7 @@ export default function App() {
   const [analysisMode, setAnalysisMode] = useState(false);
   const [selectedAnalysisModel, setSelectedAnalysisModel] = useState(defaultModel);
   const [activeAiAction, setActiveAiAction] = useState(null);
-  // Removed aiActionResults as results are handled within tools like PunchlineOptimizer
+  // Removed aiActionResults as results are handled within tools
   const [rightPanelTab, setRightPanelTab] = useState('process');
   const [transcriptionText, setTranscriptionText] = useState("");
   const [organizedResultForReview, setOrganizedResultForReview] = useState(null);
@@ -52,68 +53,61 @@ export default function App() {
 
   // --- Effects ---
    useEffect(() => { // Load initial data
+     console.log("App initializing: Loading data...");
      const savedFocus = localStorage.getItem("comedyFocusItem");
      const savedLibrary = localStorage.getItem("comedyLibrary");
      try {
-         if (savedFocus) setFocusItem(JSON.parse(savedFocus));
+         if (savedFocus) { console.log("Found focus item"); setFocusItem(JSON.parse(savedFocus)); }
          setLibrary(savedLibrary ? JSON.parse(savedLibrary) : libraryData);
-     } catch (error) { console.error("Load Err",e);localStorage.clear();setLibrary(libraryData); }
-   }, []);
+         console.log(`Lib loaded: ${savedLibrary ? JSON.parse(savedLibrary).length : libraryData.length} items.`);
+     } catch (e) { console.error("Load Err",e);localStorage.clear();setLibrary(libraryData);setFocusItem(null); }
+   }, []); // Runs only once on mount
 
-   useEffect(() => { // Save library (triggered by library state change)
-       try { if (library && library.length > 0) localStorage.setItem("comedyLibrary", JSON.stringify(library)); } catch(e){console.error("Lib save error",e)}
+   useEffect(() => { // Save library
+       // console.log("Saving library to localStorage...");
+       try { if (library && library.length >= 0) localStorage.setItem("comedyLibrary", JSON.stringify(library)); }
+       catch(e){ console.error("Lib save error",e); setLastError("Lib Save Err"); }
    }, [library]);
 
-   useEffect(() => { // Save focus item (triggered by focusItem state change)
+   useEffect(() => { // Save focus item
+     // console.log("Saving focus item to localStorage...");
      if (focusItem) {
        try {
          const data = JSON.stringify(focusItem);
-         // Basic size check example
-         if (data.length > 4 * 1024 * 1024) { console.warn("Focus item too large."); setLastError("Warning: Item too large to save."); return; }
+         if (data.length > 4 * 1024 * 1024) { console.warn("Focus item too large."); setLastError("Warning: Item too large."); return; }
          localStorage.setItem("comedyFocusItem", data);
-       } catch (error) { console.error("Focus save",e); setLastError("Focus Save Err");}
+       } catch (e) { console.error("Focus save",e); setLastError("Focus Save Err"); }
      } else {
-        localStorage.removeItem("comedyFocusItem"); // Clear if focus is null
+        // console.log("Clearing focus item from localStorage.");
+        localStorage.removeItem("comedyFocusItem");
      }
    }, [focusItem]);
 
-  useEffect(() => { // Reset analysis mode when focus item changes
+  useEffect(() => { // Reset analysis mode on focus change
+    // console.log("Focus changed, reset analysis.");
     setAnalysisMode(false); setActiveAiAction(null);
   }, [focusItem]);
 
   // Auto-switch library tab based ONLY on focusItem change
   useEffect(() => {
-    // console.log("--- Focus Item Changed ---"); // Debug Log
     if (focusItem) {
-        // console.log(`Focus Item Type: ${focusItem.type}`); // Debug Log
         let childCategory = null;
         switch (focusItem.type) {
             case 'special': childCategory = 'set'; break;
             case 'set': childCategory = 'bit'; break;
             case 'bit': childCategory = 'joke'; break;
             case 'joke': childCategory = 'idea'; break;
-            case 'idea': childCategory = 'idea'; break; // Keep on idea
-            default: childCategory = activeLibCategory; // Keep current if unknown type
+            case 'idea': childCategory = 'idea'; break;
+            default: childCategory = activeLibCategory;
         }
-        // console.log(`Determined Child Category: ${childCategory}`); // Debug Log
-
-        // Only switch if the determined category is valid and *different*
         if (childCategory && categories.includes(childCategory)) {
-            if (childCategory !== activeLibCategory) {
-                 // console.log(`Switching Active Library Category to "${childCategory}"`); // Debug Log
-                 setActiveLibCategory(childCategory);
-            }
-            // else { console.log(`Child category "${childCategory}" already active.`); } // Debug Log
+            if (childCategory !== activeLibCategory) { setActiveLibCategory(childCategory); }
         }
-        // else { console.log(`Invalid child category (${childCategory}), keeping "${activeLibCategory}"`); } // Debug Log
     }
-    // else { console.log("Focus Item is null."); } // Debug Log
-    // console.log("--- End Focus Change Effect ---");
   }, [focusItem]); // Only depends on focusItem
 
   // --- Handlers ---
 
-  // Wrap handlers in useCallback to stabilize references passed down as props
   const handleDragStart = useCallback((e, item) => {
      console.log("DnD Start:", item?.id);
      try { const data = JSON.stringify(item); e.dataTransfer.setData("application/json", data); e.dataTransfer.effectAllowed = "move"; }
@@ -129,18 +123,18 @@ export default function App() {
   }, [focusItem]);
 
   const handleDropIntoChild = useCallback((e, targetItem) => { // Nesting
-      console.log(`DnD Nest Start: Dropping ON target ${targetItem.id}`);
+      console.log(`DnD Nest Start: Drop ON target ${targetItem.id}`);
       e.preventDefault(); e.stopPropagation();
       if (!focusItem) { setLastError("No focus item."); return; }
       try {
-          const draggedItemData = e.dataTransfer.getData("application/json"); if (!draggedItemData) { setLastError("Inv Nest Drop Data"); return; }
+          const draggedItemData = e.dataTransfer.getData("application/json"); if (!draggedItemData) { setLastError("Inv Nest Data"); return; }
           const draggedItem = JSON.parse(draggedItemData);
-          console.log(`DnD Nest: Dragged item ${draggedItem.id}`);
+          console.log(`DnD Nest: Dragged ${draggedItem.id}`);
           if (draggedItem.id === targetItem.id) { setLastError("Cannot drop onto self."); setTimeout(() => setLastError(""), 3000); return; }
           if (checkCircular(draggedItem, targetItem.id)) { setLastError("Circular reference."); setTimeout(() => setLastError(""), 3000); return; }
 
           setFocusItem(currentFocus => {
-              console.log("DnD Nest: Updating focus state...");
+              console.log("DnD Nest: Updating state...");
               if (!currentFocus) return null;
               const updatedFocus = structuredClone(currentFocus);
               const actualNewParent = findNode(updatedFocus, targetItem.id);
@@ -159,8 +153,7 @@ export default function App() {
               actualNewParent.children.push(clonedDraggedItem);
               console.log(`DnD Nest: Added ${clonedDraggedItem.id} to ${actualNewParent.id}. New children#: ${actualNewParent.children.length}`);
 
-              setLastError("");
-              console.log("DnD Nest: Update complete.");
+              setLastError(""); console.log("DnD Nest: Update success.");
               return updatedFocus;
           });
       } catch (error) { console.error("Drop into child error:", error); setLastError("Drop Err."); setTimeout(() => setLastError(""), 3000); }
@@ -171,13 +164,13 @@ export default function App() {
       e.preventDefault(); e.stopPropagation();
       if (!focusItem) { setLastError("No focus item."); return; }
       try {
-          const draggedItemData = e.dataTransfer.getData("application/json"); if (!draggedItemData) { setLastError("Inv Reorder Drop Data"); return; }
+          const draggedItemData = e.dataTransfer.getData("application/json"); if (!draggedItemData) { setLastError("Inv Reorder Data"); return; }
           const draggedItem = JSON.parse(draggedItemData);
-          console.log(`DnD Reorder: Dragged item ${draggedItem.id}`);
+          console.log(`DnD Reorder: Dragged ${draggedItem.id}`);
           if (draggedItem.id === targetParentItem.id && dropIndex === -1) { setLastError("Cannot reorder self."); return; }
 
           setFocusItem(currentFocus => {
-              console.log("DnD Reorder: Updating focus state...");
+              console.log("DnD Reorder: Updating state...");
               if (!currentFocus) return null;
               const updatedFocus = structuredClone(currentFocus);
               const actualTargetParent = findNode(updatedFocus, targetParentItem.id);
@@ -197,8 +190,7 @@ export default function App() {
               actualTargetParent.children.splice(clampedIndex, 0, itemToMove);
               console.log(`DnD Reorder: Inserted ${itemToMove.id} into ${actualTargetParent.id} at ${clampedIndex}. New children#: ${actualTargetParent.children.length}`);
 
-              setLastError("");
-              console.log("DnD Reorder: Update complete.");
+              setLastError(""); console.log("DnD Reorder: Update success.");
               return updatedFocus;
           });
       } catch (error) { console.error("Reorder error:", error); setLastError("Reorder Err."); setTimeout(() => setLastError(""), 3000); }
@@ -211,7 +203,6 @@ export default function App() {
      const nodeToRemove = findNode(focusItem, target.id);
      const childrenCount = nodeToRemove?.children?.length ?? 0;
      const msg = `Remove "${target.label||target.type}"${childrenCount > 0 ? ` and ${childrenCount} child(ren)` : ''}?`;
-
      if (window.confirm(msg)) {
          console.log(`Confirmed removal for ${target.id}`);
          setFocusItem(currentFocus => {
@@ -227,7 +218,7 @@ export default function App() {
   // Library & Input Handlers
   const refreshLibrary = () => { if(window.confirm("Reset library?")){ localStorage.clear(); setFocusItem(null); setLibrary(libraryData); setLastError("Lib Reset."); setTimeout(()=>setLastError(""),3000); }};
   const handleOrganizeText = async () => { if(!transcriptionText.trim()){setLastError("No text");return;} setLastError("Organizing..."); setIsOrganizing(true); setOrganizedResultForReview(null); try{ /* Call backend /api/organize */ await new Promise(r=>setTimeout(r,1000)); const d={bits:[{id:generateId('bit'),type:'bit',label:"AI Bit",children:[{id:generateId('joke'),type:'joke',text:`Joke from ${transcriptionText.substring(0,10)}...`,versions:[]}]}],highlights:[]}; setOrganizedResultForReview(d); setLastError(""); } catch(e){console.error(e);setLastError("Organize Fail"); setOrganizedResultForReview(null); } finally {setIsOrganizing(false);} };
-  const handleSaveOrganized = async (editedData) => { if (!editedData?.bits){setLastError("No data");return;} console.log("Saving organized:", editedData); setLastError("Saving..."); try { await new Promise(r => setTimeout(r, 100)); setLibrary(currentLib => { let uL=[...currentLib]; let jA=[]; let bA=[]; const libMap=new Map(uL.map(i=>[i.id,i])); editedData.bits.forEach(b=>{ const bT={...structuredClone(b), children:[]}; (b.children||[]).forEach(jRef=>{ let jD=jRef; if(!jD.text&&jD.id){const fD=editedData.jokes?.find(j=>j.id===jD.id); if(fD)jD=fD; else{console.warn(`No data for joke ref ${jD.id}`); return;}} if(jD.type==='joke'&&jD.text){ let eId=null; try{ console.log(`Placeholder Sim Check: ${jD.text.substring(0,20)}`);/* Call /api/find-similar-joke */ } catch(e){console.error(e);} if(eId&&libMap.has(eId)){ console.log(`Found existing ${eId}`); const eJ=libMap.get(eId); const nV={id:generateId('ver'),text:jD.text,ts:new Date().toISOString()}; libMap.set(eId,{...eJ,versions:[...(eJ.versions||[]),nV]}); bT.children.push({id:eId,type:'joke'}); } else { const eNJ=jA.find(j=>j.text===jD.text); if(eNJ){ bT.children.push({id:eNJ.id,type:'joke'}); } else { const nJ={...jD,id:jD.id&&!jD.id.startsWith('review-')?jD.id:generateId('joke'),label:`Joke (${jD.text.substring(0,15)}...)`,versions:[]}; jA.push(nJ); libMap.set(nJ.id,nJ); bT.children.push({id:nJ.id,type:'joke'});}} } else if (jRef.type==='bit'){console.warn("Nested bits save NYI");}}); bA.push({...bT,id:bT.id&&!bT.id.startsWith('review-')?bT.id:generateId('bit')}); }); const finalLib=Array.from(libMap.values()); return [...finalLib, ...jA, ...bA]; }); setOrganizedResultForReview(null); setTranscriptionText(""); setLastError("Saved!"); setTimeout(()=>setLastError(""),3000); } catch(e){ console.error(e); setLastError("Save Err");}};
+  const handleSaveOrganized = async (editedData) => { if (!editedData?.bits){setLastError("No data");return;} console.log("Saving organized:", editedData); setLastError("Saving..."); try { await new Promise(r => setTimeout(r, 100)); setLibrary(currentLib => { let uL=[...currentLib]; let jA=[]; let bA=[]; const libMap=new Map(uL.map(i=>[i.id,i])); editedData.bits.forEach(b=>{ const bT={...structuredClone(b), children:[]}; (b.children||[]).forEach(jRef=>{ let jD=jRef; if(!jD.text&&jD.id){const fD=editedData.jokes?.find(j=>j.id===jD.id); if(fD)jD=fD; else{console.warn(`No data for joke ref ${jD.id}`); return;}} if(jD.type==='joke'&&jD.text){ let eId=null; try{ console.log(`Placeholder Sim Check: ${jD.text.substring(0,20)}`);/* Call /api/find-similar-joke */ } catch(e){console.error(e);} if(eId&&libMap.has(eId)){ console.log(`Found existing ${eId}`); const eJ=libMap.get(eId); const nV={id:generateId('ver'),text:jD.text,ts:new Date().toISOString()}; libMap.set(eId,{...eJ,versions:[...(eJ.versions||[]), nV]}); bT.children.push({id:eId,type:'joke'}); } else { const eNJ=jA.find(j=>j.text===jD.text); if(eNJ){ bT.children.push({id:eNJ.id,type:'joke'}); } else { const nJ={...jD,id:jD.id&&!jD.id.startsWith('review-')?jD.id:generateId('joke'),label:`Joke (${jD.text.substring(0,15)}...)`,versions:[]}; jA.push(nJ); libMap.set(nJ.id,nJ); bT.children.push({id:nJ.id,type:'joke'});}} } else if (jRef.type==='bit'){console.warn("Nested bits save NYI");}}); bA.push({...bT,id:bT.id&&!bT.id.startsWith('review-')?bT.id:generateId('bit')}); }); const finalLib=Array.from(libMap.values()); return [...finalLib, ...jA, ...bA]; }); setOrganizedResultForReview(null); setTranscriptionText(""); setLastError("Saved!"); setTimeout(()=>setLastError(""),3000); } catch(e){ console.error(e); setLastError("Save Err");}};
   const handleAddNewIdea = () => { if(!newIdeaText.trim()){setLastError("No idea text");return;} const nI={id:generateId('idea'),type:'idea',label:`Idea (${newIdeaText.substring(0,20)}...)`,text:newIdeaText,children:[]}; setLibrary(p=>[...p,nI]); setNewIdeaText(""); setLastError("Idea Added."); setTimeout(()=>setLastError(""),3000);};
   const handleTranscriptionUpload = (data, target) => { console.log("Upload:", data, "Target:", target); if(data?.transcription){ if (target === 'idea') { setNewIdeaText(p => p ? `${p}\n\n${data.transcription}`: data.transcription); } else { setTranscriptionText(p => p ? `${p}\n\n${data.transcription}`: data.transcription); } } setLastError("Upload Ok."); setTimeout(()=>setLastError(""),3000);};
 
@@ -274,16 +265,18 @@ export default function App() {
               </div>
               <div className="analysis-results-area">
                    {activeAiAction === 'Punchline Optimizer' && focusItem && ( <PunchlineOptimizer jokeItem={focusItem} selectedModel={selectedAnalysisModel} /> )}
-                   {/* Add rendering for other tools based on activeAiAction */}
-                   {activeAiAction && activeAiAction !== 'Punchline Optimizer' && ( <div>{activeAiAction} results using {selectedAnalysisModel}... (Tool Component Placeholder)</div> )}
+                   {activeAiAction === 'Joke Analysis' && focusItem && (
+                     <JokeAnalysis jokeText={focusItem.text} />
+                   )}
+                   {activeAiAction && activeAiAction !== 'Punchline Optimizer' && activeAiAction !== 'Joke Analysis' && ( <div>{activeAiAction} results using {selectedAnalysisModel}... (Tool Component Placeholder)</div> )}
                    {!activeAiAction && <div className="tool-desc">Select action above.</div>}
               </div>
             </div>
           ) : (
             <>
-              <div className="tab-buttons-container standard-tabs"> {["builder", "text", "versions"].map(tab => ( <button key={tab} className={`btn tab-btn ${activeMainTab === tab ? "active" : ""}`} onClick={() => setActiveMainTab(tab)}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</button> ))} </div>
+              <div className="tab-buttons-container standard-tabs"> {["builder", "text", "versions"].map(tab => ( <button key={tab} className={`btn tab-btn ${activeMainTab === tab ? "active" : ""}`} onClick={() => setActiveMainTab(tab)}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</button>))} </div>
               <div className="tab-content">
-                  {/* Ensure ALL necessary props are passed down to BlockComponent */}
+                  {/* Ensure ALL necessary props including handlers and typeColors are passed down */}
                   {activeMainTab === 'builder' && ( focusItem ? <div className="builder-area drop-zone"><BlockComponent item={focusItem} level={0} onDropChild={handleDropIntoChild} onRemoveChild={handleRemoveChild} onDragStart={handleDragStart} onReorder={handleReorder} parent={null} typeColors={typeColors} /></div> : <div className="tool-desc">Focus an item</div> )}
                   {activeMainTab === 'text' && renderTextTab()}
                   {activeMainTab === 'versions' && <div className="tool-desc">Versions (placeholder)</div>}
@@ -309,9 +302,9 @@ export default function App() {
              <div className="input-section idea-section">
                  <h3>Add Quick Idea</h3>
                  <textarea className="idea-input-box" placeholder="Jot down premise, observation, punchline, tag..." rows={6} value={newIdeaText} onChange={(e)=>setNewIdeaText(e.target.value)} />
+                 {/* Add Upload/Record to Idea Tab */}
                  <div className="input-buttons idea-buttons">
                      <button className="btn">🎙️ Record Idea</button>
-                     {/* Pass 'idea' target to upload handler */}
                      <MediaUpload onUploadComplete={(d)=>handleTranscriptionUpload(d, 'idea')} />
                  </div>
                  <button className="btn" onClick={handleAddNewIdea} disabled={!newIdeaText.trim()}>Add Idea</button>

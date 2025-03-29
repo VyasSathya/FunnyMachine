@@ -1,0 +1,2045 @@
+[
+  {
+    "id": "set_chewed_up_hd_20250326_233217",
+    "title": "Chewed_Up_HD_20250326_233217",
+    "description": "Complete set from Chewed_Up_HD_20250326_233217",
+    "bit_ids": [
+      "bit_chewed_up_hd_20250326_233217_0",
+      "bit_chewed_up_hd_20250326_233217_1",
+      "bit_chewed_up_hd_20250326_233217_2",
+      "bit_chewed_up_hd_20250326_233217_3",
+      "bit_chewed_up_hd_20250326_233217_4",
+      "bit_chewed_up_hd_20250326_233217_5",
+      "bit_chewed_up_hd_20250326_233217_6",
+      "bit_chewed_up_hd_20250326_233217_7"
+    ],
+    "transitions": [
+      {
+        "from_bit_id": "bit_chewed_up_hd_20250326_233217_0",
+        "to_bit_id": "bit_chewed_up_hd_20250326_233217_1",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_chewed_up_hd_20250326_233217_1",
+        "to_bit_id": "bit_chewed_up_hd_20250326_233217_2",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_chewed_up_hd_20250326_233217_2",
+        "to_bit_id": "bit_chewed_up_hd_20250326_233217_3",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_chewed_up_hd_20250326_233217_3",
+        "to_bit_id": "bit_chewed_up_hd_20250326_233217_4",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_chewed_up_hd_20250326_233217_4",
+        "to_bit_id": "bit_chewed_up_hd_20250326_233217_5",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_chewed_up_hd_20250326_233217_5",
+        "to_bit_id": "bit_chewed_up_hd_20250326_233217_6",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_chewed_up_hd_20250326_233217_6",
+        "to_bit_id": "bit_chewed_up_hd_20250326_233217_7",
+        "text": "",
+        "strength": 0.5
+      }
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.947Z",
+      "last_modified": "2025-03-29T16:51:43.947Z",
+      "venues_performed": [
+        "Comedy Club"
+      ],
+      "duration_minutes": 13
+    },
+    "analysis": {
+      "primary_technique": "thematic_threading",
+      "energy_mapping": [
+        {
+          "position": 0,
+          "level": "medium"
+        },
+        {
+          "position": 0.14285714285714285,
+          "level": "medium"
+        },
+        {
+          "position": 0.2857142857142857,
+          "level": "medium"
+        },
+        {
+          "position": 0.42857142857142855,
+          "level": "medium"
+        },
+        {
+          "position": 0.5714285714285714,
+          "level": "low"
+        },
+        {
+          "position": 0.7142857142857143,
+          "level": "medium"
+        },
+        {
+          "position": 0.8571428571428571,
+          "level": "medium"
+        },
+        {
+          "position": 1,
+          "level": "medium"
+        }
+      ],
+      "callback_opportunities": [],
+      "audience_journey": {
+        "opening_emotion": "curiosity",
+        "peak_emotion": "recognition",
+        "closing_emotion": "satisfaction"
+      },
+      "venue_compatibility": {
+        "club": 0.9,
+        "corporate": 0.5,
+        "theater": 0.8
+      }
+    },
+    "creative_feedback": {
+      "flow_assessment": 0.7,
+      "energy_balance": 0.7,
+      "technique_variety": 0.6,
+      "improvements": [
+        "Consider varying the energy levels more throughout the set",
+        "Look for opportunities to create callbacks between bits"
+      ]
+    }
+  },
+  {
+    "id": "set_hilarious_hd_20250327_041817",
+    "title": "Hilarious_HD_20250327_041817",
+    "description": "Complete set from Hilarious_HD_20250327_041817",
+    "bit_ids": [
+      "bit_hilarious_hd_20250327_041817_0",
+      "bit_hilarious_hd_20250327_041817_1",
+      "bit_hilarious_hd_20250327_041817_2",
+      "bit_hilarious_hd_20250327_041817_3",
+      "bit_hilarious_hd_20250327_041817_4"
+    ],
+    "transitions": [
+      {
+        "from_bit_id": "bit_hilarious_hd_20250327_041817_0",
+        "to_bit_id": "bit_hilarious_hd_20250327_041817_1",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_hilarious_hd_20250327_041817_1",
+        "to_bit_id": "bit_hilarious_hd_20250327_041817_2",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_hilarious_hd_20250327_041817_2",
+        "to_bit_id": "bit_hilarious_hd_20250327_041817_3",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_hilarious_hd_20250327_041817_3",
+        "to_bit_id": "bit_hilarious_hd_20250327_041817_4",
+        "text": "",
+        "strength": 0.5
+      }
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.953Z",
+      "last_modified": "2025-03-29T16:51:43.953Z",
+      "venues_performed": [
+        "Comedy Club"
+      ],
+      "duration_minutes": 14
+    },
+    "analysis": {
+      "primary_technique": "thematic_threading",
+      "energy_mapping": [
+        {
+          "position": 0,
+          "level": "medium"
+        },
+        {
+          "position": 0.08333333333333333,
+          "level": "medium"
+        },
+        {
+          "position": 0.16666666666666666,
+          "level": "medium"
+        },
+        {
+          "position": 0.25,
+          "level": "medium"
+        },
+        {
+          "position": 0.3333333333333333,
+          "level": "low"
+        },
+        {
+          "position": 0.4166666666666667,
+          "level": "medium"
+        },
+        {
+          "position": 0.5,
+          "level": "medium"
+        },
+        {
+          "position": 0.5833333333333334,
+          "level": "medium"
+        },
+        {
+          "position": 0.6666666666666666,
+          "level": "medium"
+        },
+        {
+          "position": 0.75,
+          "level": "medium"
+        },
+        {
+          "position": 0.8333333333333334,
+          "level": "low"
+        },
+        {
+          "position": 0.9166666666666666,
+          "level": "medium"
+        },
+        {
+          "position": 1,
+          "level": "low"
+        }
+      ],
+      "callback_opportunities": [],
+      "audience_journey": {
+        "opening_emotion": "curiosity",
+        "peak_emotion": "recognition",
+        "closing_emotion": "satisfaction"
+      },
+      "venue_compatibility": {
+        "club": 0.9,
+        "corporate": 0.5,
+        "theater": 0.8
+      }
+    },
+    "creative_feedback": {
+      "flow_assessment": 0.7,
+      "energy_balance": 0.7,
+      "technique_variety": 0.6,
+      "improvements": [
+        "Consider varying the energy levels more throughout the set",
+        "Look for opportunities to create callbacks between bits"
+      ]
+    }
+  },
+  {
+    "id": "set_live_at_the_beacon_theater_20250327_062436",
+    "title": "Live_at_the_Beacon_Theater_20250327_062436",
+    "description": "Complete set from Live_at_the_Beacon_Theater_20250327_062436",
+    "bit_ids": [
+      "bit_live_at_the_beacon_theater_20250327_062436_0",
+      "bit_live_at_the_beacon_theater_20250327_062436_1",
+      "bit_live_at_the_beacon_theater_20250327_062436_2",
+      "bit_live_at_the_beacon_theater_20250327_062436_3",
+      "bit_live_at_the_beacon_theater_20250327_062436_4",
+      "bit_live_at_the_beacon_theater_20250327_062436_5",
+      "bit_live_at_the_beacon_theater_20250327_062436_6",
+      "bit_live_at_the_beacon_theater_20250327_062436_7"
+    ],
+    "transitions": [
+      {
+        "from_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_0",
+        "to_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_1",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_1",
+        "to_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_2",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_2",
+        "to_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_3",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_3",
+        "to_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_4",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_4",
+        "to_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_5",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_5",
+        "to_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_6",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_6",
+        "to_bit_id": "bit_live_at_the_beacon_theater_20250327_062436_7",
+        "text": "",
+        "strength": 0.5
+      }
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.957Z",
+      "last_modified": "2025-03-29T16:51:43.957Z",
+      "venues_performed": [
+        "Comedy Club"
+      ],
+      "duration_minutes": 17
+    },
+    "analysis": {
+      "primary_technique": "thematic_threading",
+      "energy_mapping": [
+        {
+          "position": 0,
+          "level": "medium"
+        },
+        {
+          "position": 0.05,
+          "level": "medium"
+        },
+        {
+          "position": 0.1,
+          "level": "medium"
+        },
+        {
+          "position": 0.15,
+          "level": "medium"
+        },
+        {
+          "position": 0.2,
+          "level": "low"
+        },
+        {
+          "position": 0.25,
+          "level": "medium"
+        },
+        {
+          "position": 0.3,
+          "level": "medium"
+        },
+        {
+          "position": 0.35,
+          "level": "medium"
+        },
+        {
+          "position": 0.4,
+          "level": "medium"
+        },
+        {
+          "position": 0.45,
+          "level": "medium"
+        },
+        {
+          "position": 0.5,
+          "level": "low"
+        },
+        {
+          "position": 0.55,
+          "level": "medium"
+        },
+        {
+          "position": 0.6,
+          "level": "low"
+        },
+        {
+          "position": 0.65,
+          "level": "medium"
+        },
+        {
+          "position": 0.7,
+          "level": "low"
+        },
+        {
+          "position": 0.75,
+          "level": "low"
+        },
+        {
+          "position": 0.8,
+          "level": "low"
+        },
+        {
+          "position": 0.85,
+          "level": "low"
+        },
+        {
+          "position": 0.9,
+          "level": "low"
+        },
+        {
+          "position": 0.95,
+          "level": "low"
+        },
+        {
+          "position": 1,
+          "level": "low"
+        }
+      ],
+      "callback_opportunities": [],
+      "audience_journey": {
+        "opening_emotion": "curiosity",
+        "peak_emotion": "recognition",
+        "closing_emotion": "satisfaction"
+      },
+      "venue_compatibility": {
+        "club": 0.9,
+        "corporate": 0.5,
+        "theater": 0.8
+      }
+    },
+    "creative_feedback": {
+      "flow_assessment": 0.7,
+      "energy_balance": 0.7,
+      "technique_variety": 0.6,
+      "improvements": [
+        "Consider varying the energy levels more throughout the set",
+        "Look for opportunities to create callbacks between bits"
+      ]
+    }
+  },
+  {
+    "id": "set_live_at_the_comedy_store_hd_20250327_090801",
+    "title": "Live_at_the_Comedy_Store_HD_20250327_090801",
+    "description": "Complete set from Live_at_the_Comedy_Store_HD_20250327_090801",
+    "bit_ids": [
+      "bit_live_at_the_comedy_store_hd_20250327_090801_0",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_1",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_2",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_3",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_4",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_5",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_6",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_7",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_8",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_9",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_10",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_11",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_12",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_13",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_14",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_15",
+      "bit_live_at_the_comedy_store_hd_20250327_090801_16"
+    ],
+    "transitions": [
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_0",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_1",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_1",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_2",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_2",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_3",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_3",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_4",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_4",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_5",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_5",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_6",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_6",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_7",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_7",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_8",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_8",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_9",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_9",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_10",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_10",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_11",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_11",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_12",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_12",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_13",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_13",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_14",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_14",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_15",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_15",
+        "to_bit_id": "bit_live_at_the_comedy_store_hd_20250327_090801_16",
+        "text": "",
+        "strength": 0.5
+      }
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.969Z",
+      "last_modified": "2025-03-29T16:51:43.969Z",
+      "venues_performed": [
+        "Comedy Club"
+      ],
+      "duration_minutes": 27
+    },
+    "analysis": {
+      "primary_technique": "thematic_threading",
+      "energy_mapping": [
+        {
+          "position": 0,
+          "level": "medium"
+        },
+        {
+          "position": 0.02702702702702703,
+          "level": "medium"
+        },
+        {
+          "position": 0.05405405405405406,
+          "level": "medium"
+        },
+        {
+          "position": 0.08108108108108109,
+          "level": "medium"
+        },
+        {
+          "position": 0.10810810810810811,
+          "level": "low"
+        },
+        {
+          "position": 0.13513513513513514,
+          "level": "medium"
+        },
+        {
+          "position": 0.16216216216216217,
+          "level": "medium"
+        },
+        {
+          "position": 0.1891891891891892,
+          "level": "medium"
+        },
+        {
+          "position": 0.21621621621621623,
+          "level": "medium"
+        },
+        {
+          "position": 0.24324324324324326,
+          "level": "medium"
+        },
+        {
+          "position": 0.2702702702702703,
+          "level": "low"
+        },
+        {
+          "position": 0.2972972972972973,
+          "level": "medium"
+        },
+        {
+          "position": 0.32432432432432434,
+          "level": "low"
+        },
+        {
+          "position": 0.35135135135135137,
+          "level": "medium"
+        },
+        {
+          "position": 0.3783783783783784,
+          "level": "low"
+        },
+        {
+          "position": 0.40540540540540543,
+          "level": "low"
+        },
+        {
+          "position": 0.43243243243243246,
+          "level": "low"
+        },
+        {
+          "position": 0.4594594594594595,
+          "level": "low"
+        },
+        {
+          "position": 0.4864864864864865,
+          "level": "low"
+        },
+        {
+          "position": 0.5135135135135135,
+          "level": "low"
+        },
+        {
+          "position": 0.5405405405405406,
+          "level": "low"
+        },
+        {
+          "position": 0.5675675675675675,
+          "level": "medium"
+        },
+        {
+          "position": 0.5945945945945946,
+          "level": "low"
+        },
+        {
+          "position": 0.6216216216216216,
+          "level": "low"
+        },
+        {
+          "position": 0.6486486486486487,
+          "level": "medium"
+        },
+        {
+          "position": 0.6756756756756757,
+          "level": "medium"
+        },
+        {
+          "position": 0.7027027027027027,
+          "level": "low"
+        },
+        {
+          "position": 0.7297297297297297,
+          "level": "medium"
+        },
+        {
+          "position": 0.7567567567567568,
+          "level": "medium"
+        },
+        {
+          "position": 0.7837837837837838,
+          "level": "medium"
+        },
+        {
+          "position": 0.8108108108108109,
+          "level": "low"
+        },
+        {
+          "position": 0.8378378378378378,
+          "level": "low"
+        },
+        {
+          "position": 0.8648648648648649,
+          "level": "low"
+        },
+        {
+          "position": 0.8918918918918919,
+          "level": "low"
+        },
+        {
+          "position": 0.918918918918919,
+          "level": "low"
+        },
+        {
+          "position": 0.9459459459459459,
+          "level": "low"
+        },
+        {
+          "position": 0.972972972972973,
+          "level": "medium"
+        },
+        {
+          "position": 1,
+          "level": "medium"
+        }
+      ],
+      "callback_opportunities": [],
+      "audience_journey": {
+        "opening_emotion": "curiosity",
+        "peak_emotion": "recognition",
+        "closing_emotion": "satisfaction"
+      },
+      "venue_compatibility": {
+        "club": 0.9,
+        "corporate": 0.5,
+        "theater": 0.8
+      }
+    },
+    "creative_feedback": {
+      "flow_assessment": 0.7,
+      "energy_balance": 0.7,
+      "technique_variety": 0.6,
+      "improvements": [
+        "Consider varying the energy levels more throughout the set",
+        "Look for opportunities to create callbacks between bits"
+      ]
+    }
+  },
+  {
+    "id": "set_louis_c_k__at_the_dolby__hd__20250327_112544",
+    "title": "Louis_C.K._at_The_Dolby_(HD)_20250327_112544",
+    "description": "Complete set from Louis_C.K._at_The_Dolby_(HD)_20250327_112544",
+    "bit_ids": [
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_0",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_1",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_2",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_3",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_4",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_5",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_6",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_7",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_8",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_9",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_10",
+      "bit_louis_c_k__at_the_dolby__hd__20250327_112544_11"
+    ],
+    "transitions": [
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_0",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_1",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_1",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_2",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_2",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_3",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_3",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_4",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_4",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_5",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_5",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_6",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_6",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_7",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_7",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_8",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_8",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_9",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_9",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_10",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_10",
+        "to_bit_id": "bit_louis_c_k__at_the_dolby__hd__20250327_112544_11",
+        "text": "",
+        "strength": 0.5
+      }
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.977Z",
+      "last_modified": "2025-03-29T16:51:43.977Z",
+      "venues_performed": [
+        "Comedy Club"
+      ],
+      "duration_minutes": 34
+    },
+    "analysis": {
+      "primary_technique": "thematic_threading",
+      "energy_mapping": [
+        {
+          "position": 0,
+          "level": "medium"
+        },
+        {
+          "position": 0.02040816326530612,
+          "level": "medium"
+        },
+        {
+          "position": 0.04081632653061224,
+          "level": "medium"
+        },
+        {
+          "position": 0.061224489795918366,
+          "level": "medium"
+        },
+        {
+          "position": 0.08163265306122448,
+          "level": "low"
+        },
+        {
+          "position": 0.10204081632653061,
+          "level": "medium"
+        },
+        {
+          "position": 0.12244897959183673,
+          "level": "medium"
+        },
+        {
+          "position": 0.14285714285714285,
+          "level": "medium"
+        },
+        {
+          "position": 0.16326530612244897,
+          "level": "medium"
+        },
+        {
+          "position": 0.1836734693877551,
+          "level": "medium"
+        },
+        {
+          "position": 0.20408163265306123,
+          "level": "low"
+        },
+        {
+          "position": 0.22448979591836735,
+          "level": "medium"
+        },
+        {
+          "position": 0.24489795918367346,
+          "level": "low"
+        },
+        {
+          "position": 0.2653061224489796,
+          "level": "medium"
+        },
+        {
+          "position": 0.2857142857142857,
+          "level": "low"
+        },
+        {
+          "position": 0.30612244897959184,
+          "level": "low"
+        },
+        {
+          "position": 0.32653061224489793,
+          "level": "low"
+        },
+        {
+          "position": 0.3469387755102041,
+          "level": "low"
+        },
+        {
+          "position": 0.3673469387755102,
+          "level": "low"
+        },
+        {
+          "position": 0.3877551020408163,
+          "level": "low"
+        },
+        {
+          "position": 0.40816326530612246,
+          "level": "low"
+        },
+        {
+          "position": 0.42857142857142855,
+          "level": "medium"
+        },
+        {
+          "position": 0.4489795918367347,
+          "level": "low"
+        },
+        {
+          "position": 0.46938775510204084,
+          "level": "low"
+        },
+        {
+          "position": 0.4897959183673469,
+          "level": "medium"
+        },
+        {
+          "position": 0.5102040816326531,
+          "level": "medium"
+        },
+        {
+          "position": 0.5306122448979592,
+          "level": "low"
+        },
+        {
+          "position": 0.5510204081632653,
+          "level": "medium"
+        },
+        {
+          "position": 0.5714285714285714,
+          "level": "medium"
+        },
+        {
+          "position": 0.5918367346938775,
+          "level": "medium"
+        },
+        {
+          "position": 0.6122448979591837,
+          "level": "low"
+        },
+        {
+          "position": 0.6326530612244898,
+          "level": "low"
+        },
+        {
+          "position": 0.6530612244897959,
+          "level": "low"
+        },
+        {
+          "position": 0.673469387755102,
+          "level": "low"
+        },
+        {
+          "position": 0.6938775510204082,
+          "level": "low"
+        },
+        {
+          "position": 0.7142857142857143,
+          "level": "low"
+        },
+        {
+          "position": 0.7346938775510204,
+          "level": "medium"
+        },
+        {
+          "position": 0.7551020408163265,
+          "level": "medium"
+        },
+        {
+          "position": 0.7755102040816326,
+          "level": "medium"
+        },
+        {
+          "position": 0.7959183673469388,
+          "level": "low"
+        },
+        {
+          "position": 0.8163265306122449,
+          "level": "medium"
+        },
+        {
+          "position": 0.8367346938775511,
+          "level": "low"
+        },
+        {
+          "position": 0.8571428571428571,
+          "level": "medium"
+        },
+        {
+          "position": 0.8775510204081632,
+          "level": "low"
+        },
+        {
+          "position": 0.8979591836734694,
+          "level": "medium"
+        },
+        {
+          "position": 0.9183673469387755,
+          "level": "medium"
+        },
+        {
+          "position": 0.9387755102040817,
+          "level": "medium"
+        },
+        {
+          "position": 0.9591836734693877,
+          "level": "medium"
+        },
+        {
+          "position": 0.9795918367346939,
+          "level": "medium"
+        },
+        {
+          "position": 1,
+          "level": "medium"
+        }
+      ],
+      "callback_opportunities": [],
+      "audience_journey": {
+        "opening_emotion": "curiosity",
+        "peak_emotion": "recognition",
+        "closing_emotion": "satisfaction"
+      },
+      "venue_compatibility": {
+        "club": 0.9,
+        "corporate": 0.5,
+        "theater": 0.8
+      }
+    },
+    "creative_feedback": {
+      "flow_assessment": 0.7,
+      "energy_balance": 0.7,
+      "technique_variety": 0.6,
+      "improvements": [
+        "Consider varying the energy levels more throughout the set",
+        "Look for opportunities to create callbacks between bits"
+      ]
+    }
+  },
+  {
+    "id": "set_oh_my_god__hd__20250327_133344",
+    "title": "Oh_My_God__HD__20250327_133344",
+    "description": "Complete set from Oh_My_God__HD__20250327_133344",
+    "bit_ids": [
+      "bit_oh_my_god__hd__20250327_133344_0",
+      "bit_oh_my_god__hd__20250327_133344_1",
+      "bit_oh_my_god__hd__20250327_133344_2",
+      "bit_oh_my_god__hd__20250327_133344_3",
+      "bit_oh_my_god__hd__20250327_133344_4",
+      "bit_oh_my_god__hd__20250327_133344_5"
+    ],
+    "transitions": [
+      {
+        "from_bit_id": "bit_oh_my_god__hd__20250327_133344_0",
+        "to_bit_id": "bit_oh_my_god__hd__20250327_133344_1",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_oh_my_god__hd__20250327_133344_1",
+        "to_bit_id": "bit_oh_my_god__hd__20250327_133344_2",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_oh_my_god__hd__20250327_133344_2",
+        "to_bit_id": "bit_oh_my_god__hd__20250327_133344_3",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_oh_my_god__hd__20250327_133344_3",
+        "to_bit_id": "bit_oh_my_god__hd__20250327_133344_4",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_oh_my_god__hd__20250327_133344_4",
+        "to_bit_id": "bit_oh_my_god__hd__20250327_133344_5",
+        "text": "",
+        "strength": 0.5
+      }
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.981Z",
+      "last_modified": "2025-03-29T16:51:43.981Z",
+      "venues_performed": [
+        "Comedy Club"
+      ],
+      "duration_minutes": 39
+    },
+    "analysis": {
+      "primary_technique": "thematic_threading",
+      "energy_mapping": [
+        {
+          "position": 0,
+          "level": "medium"
+        },
+        {
+          "position": 0.01818181818181818,
+          "level": "medium"
+        },
+        {
+          "position": 0.03636363636363636,
+          "level": "medium"
+        },
+        {
+          "position": 0.05454545454545454,
+          "level": "medium"
+        },
+        {
+          "position": 0.07272727272727272,
+          "level": "low"
+        },
+        {
+          "position": 0.09090909090909091,
+          "level": "medium"
+        },
+        {
+          "position": 0.10909090909090909,
+          "level": "medium"
+        },
+        {
+          "position": 0.12727272727272726,
+          "level": "medium"
+        },
+        {
+          "position": 0.14545454545454545,
+          "level": "medium"
+        },
+        {
+          "position": 0.16363636363636364,
+          "level": "medium"
+        },
+        {
+          "position": 0.18181818181818182,
+          "level": "low"
+        },
+        {
+          "position": 0.2,
+          "level": "medium"
+        },
+        {
+          "position": 0.21818181818181817,
+          "level": "low"
+        },
+        {
+          "position": 0.23636363636363636,
+          "level": "medium"
+        },
+        {
+          "position": 0.2545454545454545,
+          "level": "low"
+        },
+        {
+          "position": 0.2727272727272727,
+          "level": "low"
+        },
+        {
+          "position": 0.2909090909090909,
+          "level": "low"
+        },
+        {
+          "position": 0.3090909090909091,
+          "level": "low"
+        },
+        {
+          "position": 0.32727272727272727,
+          "level": "low"
+        },
+        {
+          "position": 0.34545454545454546,
+          "level": "low"
+        },
+        {
+          "position": 0.36363636363636365,
+          "level": "low"
+        },
+        {
+          "position": 0.38181818181818183,
+          "level": "medium"
+        },
+        {
+          "position": 0.4,
+          "level": "low"
+        },
+        {
+          "position": 0.41818181818181815,
+          "level": "low"
+        },
+        {
+          "position": 0.43636363636363634,
+          "level": "medium"
+        },
+        {
+          "position": 0.45454545454545453,
+          "level": "medium"
+        },
+        {
+          "position": 0.4727272727272727,
+          "level": "low"
+        },
+        {
+          "position": 0.4909090909090909,
+          "level": "medium"
+        },
+        {
+          "position": 0.509090909090909,
+          "level": "medium"
+        },
+        {
+          "position": 0.5272727272727272,
+          "level": "medium"
+        },
+        {
+          "position": 0.5454545454545454,
+          "level": "low"
+        },
+        {
+          "position": 0.5636363636363636,
+          "level": "low"
+        },
+        {
+          "position": 0.5818181818181818,
+          "level": "low"
+        },
+        {
+          "position": 0.6,
+          "level": "low"
+        },
+        {
+          "position": 0.6181818181818182,
+          "level": "low"
+        },
+        {
+          "position": 0.6363636363636364,
+          "level": "low"
+        },
+        {
+          "position": 0.6545454545454545,
+          "level": "medium"
+        },
+        {
+          "position": 0.6727272727272727,
+          "level": "medium"
+        },
+        {
+          "position": 0.6909090909090909,
+          "level": "medium"
+        },
+        {
+          "position": 0.7090909090909091,
+          "level": "low"
+        },
+        {
+          "position": 0.7272727272727273,
+          "level": "medium"
+        },
+        {
+          "position": 0.7454545454545455,
+          "level": "low"
+        },
+        {
+          "position": 0.7636363636363637,
+          "level": "medium"
+        },
+        {
+          "position": 0.7818181818181819,
+          "level": "low"
+        },
+        {
+          "position": 0.8,
+          "level": "medium"
+        },
+        {
+          "position": 0.8181818181818182,
+          "level": "medium"
+        },
+        {
+          "position": 0.8363636363636363,
+          "level": "medium"
+        },
+        {
+          "position": 0.8545454545454545,
+          "level": "medium"
+        },
+        {
+          "position": 0.8727272727272727,
+          "level": "medium"
+        },
+        {
+          "position": 0.8909090909090909,
+          "level": "medium"
+        },
+        {
+          "position": 0.9090909090909091,
+          "level": "low"
+        },
+        {
+          "position": 0.9272727272727272,
+          "level": "medium"
+        },
+        {
+          "position": 0.9454545454545454,
+          "level": "low"
+        },
+        {
+          "position": 0.9636363636363636,
+          "level": "medium"
+        },
+        {
+          "position": 0.9818181818181818,
+          "level": "low"
+        },
+        {
+          "position": 1,
+          "level": "medium"
+        }
+      ],
+      "callback_opportunities": [],
+      "audience_journey": {
+        "opening_emotion": "curiosity",
+        "peak_emotion": "recognition",
+        "closing_emotion": "satisfaction"
+      },
+      "venue_compatibility": {
+        "club": 0.9,
+        "corporate": 0.5,
+        "theater": 0.8
+      }
+    },
+    "creative_feedback": {
+      "flow_assessment": 0.7,
+      "energy_balance": 0.7,
+      "technique_variety": 0.6,
+      "improvements": [
+        "Consider varying the energy levels more throughout the set",
+        "Look for opportunities to create callbacks between bits"
+      ]
+    }
+  },
+  {
+    "id": "set_sincerely_louis_ck_hd_20250327_154256",
+    "title": "Sincerely-Louis-CK-HD_20250327_154256",
+    "description": "Complete set from Sincerely-Louis-CK-HD_20250327_154256",
+    "bit_ids": [
+      "bit_sincerely_louis_ck_hd_20250327_154256_0",
+      "bit_sincerely_louis_ck_hd_20250327_154256_1",
+      "bit_sincerely_louis_ck_hd_20250327_154256_2",
+      "bit_sincerely_louis_ck_hd_20250327_154256_3",
+      "bit_sincerely_louis_ck_hd_20250327_154256_4",
+      "bit_sincerely_louis_ck_hd_20250327_154256_5",
+      "bit_sincerely_louis_ck_hd_20250327_154256_6"
+    ],
+    "transitions": [
+      {
+        "from_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_0",
+        "to_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_1",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_1",
+        "to_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_2",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_2",
+        "to_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_3",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_3",
+        "to_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_4",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_4",
+        "to_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_5",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_5",
+        "to_bit_id": "bit_sincerely_louis_ck_hd_20250327_154256_6",
+        "text": "",
+        "strength": 0.5
+      }
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.985Z",
+      "last_modified": "2025-03-29T16:51:43.985Z",
+      "venues_performed": [
+        "Comedy Club"
+      ],
+      "duration_minutes": 42
+    },
+    "analysis": {
+      "primary_technique": "thematic_threading",
+      "energy_mapping": [
+        {
+          "position": 0,
+          "level": "medium"
+        },
+        {
+          "position": 0.016129032258064516,
+          "level": "medium"
+        },
+        {
+          "position": 0.03225806451612903,
+          "level": "medium"
+        },
+        {
+          "position": 0.04838709677419355,
+          "level": "medium"
+        },
+        {
+          "position": 0.06451612903225806,
+          "level": "low"
+        },
+        {
+          "position": 0.08064516129032258,
+          "level": "medium"
+        },
+        {
+          "position": 0.0967741935483871,
+          "level": "medium"
+        },
+        {
+          "position": 0.11290322580645161,
+          "level": "medium"
+        },
+        {
+          "position": 0.12903225806451613,
+          "level": "medium"
+        },
+        {
+          "position": 0.14516129032258066,
+          "level": "medium"
+        },
+        {
+          "position": 0.16129032258064516,
+          "level": "low"
+        },
+        {
+          "position": 0.1774193548387097,
+          "level": "medium"
+        },
+        {
+          "position": 0.1935483870967742,
+          "level": "low"
+        },
+        {
+          "position": 0.20967741935483872,
+          "level": "medium"
+        },
+        {
+          "position": 0.22580645161290322,
+          "level": "low"
+        },
+        {
+          "position": 0.24193548387096775,
+          "level": "low"
+        },
+        {
+          "position": 0.25806451612903225,
+          "level": "low"
+        },
+        {
+          "position": 0.27419354838709675,
+          "level": "low"
+        },
+        {
+          "position": 0.2903225806451613,
+          "level": "low"
+        },
+        {
+          "position": 0.3064516129032258,
+          "level": "low"
+        },
+        {
+          "position": 0.3225806451612903,
+          "level": "low"
+        },
+        {
+          "position": 0.3387096774193548,
+          "level": "medium"
+        },
+        {
+          "position": 0.3548387096774194,
+          "level": "low"
+        },
+        {
+          "position": 0.3709677419354839,
+          "level": "low"
+        },
+        {
+          "position": 0.3870967741935484,
+          "level": "medium"
+        },
+        {
+          "position": 0.4032258064516129,
+          "level": "medium"
+        },
+        {
+          "position": 0.41935483870967744,
+          "level": "low"
+        },
+        {
+          "position": 0.43548387096774194,
+          "level": "medium"
+        },
+        {
+          "position": 0.45161290322580644,
+          "level": "medium"
+        },
+        {
+          "position": 0.46774193548387094,
+          "level": "medium"
+        },
+        {
+          "position": 0.4838709677419355,
+          "level": "low"
+        },
+        {
+          "position": 0.5,
+          "level": "low"
+        },
+        {
+          "position": 0.5161290322580645,
+          "level": "low"
+        },
+        {
+          "position": 0.532258064516129,
+          "level": "low"
+        },
+        {
+          "position": 0.5483870967741935,
+          "level": "low"
+        },
+        {
+          "position": 0.5645161290322581,
+          "level": "low"
+        },
+        {
+          "position": 0.5806451612903226,
+          "level": "medium"
+        },
+        {
+          "position": 0.5967741935483871,
+          "level": "medium"
+        },
+        {
+          "position": 0.6129032258064516,
+          "level": "medium"
+        },
+        {
+          "position": 0.6290322580645161,
+          "level": "low"
+        },
+        {
+          "position": 0.6451612903225806,
+          "level": "medium"
+        },
+        {
+          "position": 0.6612903225806451,
+          "level": "low"
+        },
+        {
+          "position": 0.6774193548387096,
+          "level": "medium"
+        },
+        {
+          "position": 0.6935483870967742,
+          "level": "low"
+        },
+        {
+          "position": 0.7096774193548387,
+          "level": "medium"
+        },
+        {
+          "position": 0.7258064516129032,
+          "level": "medium"
+        },
+        {
+          "position": 0.7419354838709677,
+          "level": "medium"
+        },
+        {
+          "position": 0.7580645161290323,
+          "level": "medium"
+        },
+        {
+          "position": 0.7741935483870968,
+          "level": "medium"
+        },
+        {
+          "position": 0.7903225806451613,
+          "level": "medium"
+        },
+        {
+          "position": 0.8064516129032258,
+          "level": "low"
+        },
+        {
+          "position": 0.8225806451612904,
+          "level": "medium"
+        },
+        {
+          "position": 0.8387096774193549,
+          "level": "low"
+        },
+        {
+          "position": 0.8548387096774194,
+          "level": "medium"
+        },
+        {
+          "position": 0.8709677419354839,
+          "level": "low"
+        },
+        {
+          "position": 0.8870967741935484,
+          "level": "medium"
+        },
+        {
+          "position": 0.9032258064516129,
+          "level": "medium"
+        },
+        {
+          "position": 0.9193548387096774,
+          "level": "medium"
+        },
+        {
+          "position": 0.9354838709677419,
+          "level": "low"
+        },
+        {
+          "position": 0.9516129032258065,
+          "level": "medium"
+        },
+        {
+          "position": 0.967741935483871,
+          "level": "medium"
+        },
+        {
+          "position": 0.9838709677419355,
+          "level": "low"
+        },
+        {
+          "position": 1,
+          "level": "medium"
+        }
+      ],
+      "callback_opportunities": [],
+      "audience_journey": {
+        "opening_emotion": "curiosity",
+        "peak_emotion": "recognition",
+        "closing_emotion": "satisfaction"
+      },
+      "venue_compatibility": {
+        "club": 0.9,
+        "corporate": 0.5,
+        "theater": 0.8
+      }
+    },
+    "creative_feedback": {
+      "flow_assessment": 0.7,
+      "energy_balance": 0.7,
+      "technique_variety": 0.6,
+      "improvements": [
+        "Consider varying the energy levels more throughout the set",
+        "Look for opportunities to create callbacks between bits"
+      ]
+    }
+  },
+  {
+    "id": "set_sorry_louis_ck_20250327_174727",
+    "title": "Sorry-Louis-CK_20250327_174727",
+    "description": "Complete set from Sorry-Louis-CK_20250327_174727",
+    "bit_ids": [
+      "bit_sorry_louis_ck_20250327_174727_0",
+      "bit_sorry_louis_ck_20250327_174727_1",
+      "bit_sorry_louis_ck_20250327_174727_2",
+      "bit_sorry_louis_ck_20250327_174727_3",
+      "bit_sorry_louis_ck_20250327_174727_4",
+      "bit_sorry_louis_ck_20250327_174727_5"
+    ],
+    "transitions": [
+      {
+        "from_bit_id": "bit_sorry_louis_ck_20250327_174727_0",
+        "to_bit_id": "bit_sorry_louis_ck_20250327_174727_1",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sorry_louis_ck_20250327_174727_1",
+        "to_bit_id": "bit_sorry_louis_ck_20250327_174727_2",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sorry_louis_ck_20250327_174727_2",
+        "to_bit_id": "bit_sorry_louis_ck_20250327_174727_3",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sorry_louis_ck_20250327_174727_3",
+        "to_bit_id": "bit_sorry_louis_ck_20250327_174727_4",
+        "text": "",
+        "strength": 0.5
+      },
+      {
+        "from_bit_id": "bit_sorry_louis_ck_20250327_174727_4",
+        "to_bit_id": "bit_sorry_louis_ck_20250327_174727_5",
+        "text": "",
+        "strength": 0.5
+      }
+    ],
+    "metadata": {
+      "creation_date": "2025-03-29T16:51:43.992Z",
+      "last_modified": "2025-03-29T16:51:43.992Z",
+      "venues_performed": [
+        "Comedy Club"
+      ],
+      "duration_minutes": 46
+    },
+    "analysis": {
+      "primary_technique": "thematic_threading",
+      "energy_mapping": [
+        {
+          "position": 0,
+          "level": "medium"
+        },
+        {
+          "position": 0.014705882352941176,
+          "level": "medium"
+        },
+        {
+          "position": 0.029411764705882353,
+          "level": "medium"
+        },
+        {
+          "position": 0.04411764705882353,
+          "level": "medium"
+        },
+        {
+          "position": 0.058823529411764705,
+          "level": "low"
+        },
+        {
+          "position": 0.07352941176470588,
+          "level": "medium"
+        },
+        {
+          "position": 0.08823529411764706,
+          "level": "medium"
+        },
+        {
+          "position": 0.10294117647058823,
+          "level": "medium"
+        },
+        {
+          "position": 0.11764705882352941,
+          "level": "medium"
+        },
+        {
+          "position": 0.1323529411764706,
+          "level": "medium"
+        },
+        {
+          "position": 0.14705882352941177,
+          "level": "low"
+        },
+        {
+          "position": 0.16176470588235295,
+          "level": "medium"
+        },
+        {
+          "position": 0.17647058823529413,
+          "level": "low"
+        },
+        {
+          "position": 0.19117647058823528,
+          "level": "medium"
+        },
+        {
+          "position": 0.20588235294117646,
+          "level": "low"
+        },
+        {
+          "position": 0.22058823529411764,
+          "level": "low"
+        },
+        {
+          "position": 0.23529411764705882,
+          "level": "low"
+        },
+        {
+          "position": 0.25,
+          "level": "low"
+        },
+        {
+          "position": 0.2647058823529412,
+          "level": "low"
+        },
+        {
+          "position": 0.27941176470588236,
+          "level": "low"
+        },
+        {
+          "position": 0.29411764705882354,
+          "level": "low"
+        },
+        {
+          "position": 0.3088235294117647,
+          "level": "medium"
+        },
+        {
+          "position": 0.3235294117647059,
+          "level": "low"
+        },
+        {
+          "position": 0.3382352941176471,
+          "level": "low"
+        },
+        {
+          "position": 0.35294117647058826,
+          "level": "medium"
+        },
+        {
+          "position": 0.36764705882352944,
+          "level": "medium"
+        },
+        {
+          "position": 0.38235294117647056,
+          "level": "low"
+        },
+        {
+          "position": 0.39705882352941174,
+          "level": "medium"
+        },
+        {
+          "position": 0.4117647058823529,
+          "level": "medium"
+        },
+        {
+          "position": 0.4264705882352941,
+          "level": "medium"
+        },
+        {
+          "position": 0.4411764705882353,
+          "level": "low"
+        },
+        {
+          "position": 0.45588235294117646,
+          "level": "low"
+        },
+        {
+          "position": 0.47058823529411764,
+          "level": "low"
+        },
+        {
+          "position": 0.4852941176470588,
+          "level": "low"
+        },
+        {
+          "position": 0.5,
+          "level": "low"
+        },
+        {
+          "position": 0.5147058823529411,
+          "level": "low"
+        },
+        {
+          "position": 0.5294117647058824,
+          "level": "medium"
+        },
+        {
+          "position": 0.5441176470588235,
+          "level": "medium"
+        },
+        {
+          "position": 0.5588235294117647,
+          "level": "medium"
+        },
+        {
+          "position": 0.5735294117647058,
+          "level": "low"
+        },
+        {
+          "position": 0.5882352941176471,
+          "level": "medium"
+        },
+        {
+          "position": 0.6029411764705882,
+          "level": "low"
+        },
+        {
+          "position": 0.6176470588235294,
+          "level": "medium"
+        },
+        {
+          "position": 0.6323529411764706,
+          "level": "low"
+        },
+        {
+          "position": 0.6470588235294118,
+          "level": "medium"
+        },
+        {
+          "position": 0.6617647058823529,
+          "level": "medium"
+        },
+        {
+          "position": 0.6764705882352942,
+          "level": "medium"
+        },
+        {
+          "position": 0.6911764705882353,
+          "level": "medium"
+        },
+        {
+          "position": 0.7058823529411765,
+          "level": "medium"
+        },
+        {
+          "position": 0.7205882352941176,
+          "level": "medium"
+        },
+        {
+          "position": 0.7352941176470589,
+          "level": "low"
+        },
+        {
+          "position": 0.75,
+          "level": "medium"
+        },
+        {
+          "position": 0.7647058823529411,
+          "level": "low"
+        },
+        {
+          "position": 0.7794117647058824,
+          "level": "medium"
+        },
+        {
+          "position": 0.7941176470588235,
+          "level": "low"
+        },
+        {
+          "position": 0.8088235294117647,
+          "level": "medium"
+        },
+        {
+          "position": 0.8235294117647058,
+          "level": "medium"
+        },
+        {
+          "position": 0.8382352941176471,
+          "level": "medium"
+        },
+        {
+          "position": 0.8529411764705882,
+          "level": "low"
+        },
+        {
+          "position": 0.8676470588235294,
+          "level": "medium"
+        },
+        {
+          "position": 0.8823529411764706,
+          "level": "medium"
+        },
+        {
+          "position": 0.8970588235294118,
+          "level": "low"
+        },
+        {
+          "position": 0.9117647058823529,
+          "level": "medium"
+        },
+        {
+          "position": 0.9264705882352942,
+          "level": "medium"
+        },
+        {
+          "position": 0.9411764705882353,
+          "level": "medium"
+        },
+        {
+          "position": 0.9558823529411765,
+          "level": "medium"
+        },
+        {
+          "position": 0.9705882352941176,
+          "level": "medium"
+        },
+        {
+          "position": 0.9852941176470589,
+          "level": "medium"
+        },
+        {
+          "position": 1,
+          "level": "medium"
+        }
+      ],
+      "callback_opportunities": [],
+      "audience_journey": {
+        "opening_emotion": "curiosity",
+        "peak_emotion": "recognition",
+        "closing_emotion": "satisfaction"
+      },
+      "venue_compatibility": {
+        "club": 0.9,
+        "corporate": 0.5,
+        "theater": 0.8
+      }
+    },
+    "creative_feedback": {
+      "flow_assessment": 0.7,
+      "energy_balance": 0.7,
+      "technique_variety": 0.6,
+      "improvements": [
+        "Consider varying the energy levels more throughout the set",
+        "Look for opportunities to create callbacks between bits"
+      ]
+    }
+  }
+]

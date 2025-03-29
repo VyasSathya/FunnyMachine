@@ -1,13 +1,12 @@
 // src/components/Analysis/AnalysisTabs.js
 import React, { useState } from 'react';
 import TextAnalysis from './TextAnalysis';
-import PunchlineOptimizer from '../Tools/PunchlineOptimizer'; // <-- Import new component
+import PunchlineOptimizer from '../Tools/PunchlineOptimizer';
+import JokeAnalysis from './JokeAnalysis';
 import '../../styles/AnalysisTabs.css';
 
-// ... (rest of the component)
-
 const AnalysisTabs = ({ focusItem, selectedAIModel, onModelChange, onJokeUpdate }) => {
-  const [activeTab, setActiveTab] = useState('polish'); // Or maybe 'optimizer' as default?
+  const [activeTab, setActiveTab] = useState('polish');
 
   const renderTabContent = () => {
     if (!focusItem) return <div className="empty-analysis">Select an item to analyze</div>;
@@ -18,7 +17,7 @@ const AnalysisTabs = ({ focusItem, selectedAIModel, onModelChange, onJokeUpdate 
         if (focusItem.type === 'joke') {
           return (
             <div>
-              <TextAnalysis /* props */ />
+              <TextAnalysis jokeText={focusItem.text} />
               <hr /> {/* Separator */}
               <PunchlineOptimizer joke={focusItem} /> {/* <-- Render Optimizer */}
             </div>
@@ -27,11 +26,24 @@ const AnalysisTabs = ({ focusItem, selectedAIModel, onModelChange, onJokeUpdate 
           return <div className="empty-analysis">Polish/Optimize is currently only available for jokes</div>;
         }
       
-      // Add a new case for 'optimizer' if making it a separate tab
-      // case 'optimizer':
-      //    return <PunchlineOptimizer joke={focusItem} />
+      case 'analysis':
+        if (focusItem.type === 'joke') {
+          return <JokeAnalysis jokeText={focusItem.text} />;
+        } else {
+          return <div className="empty-analysis">Joke Analysis is currently only available for jokes</div>;
+        }
 
-      // ... (other cases: structure, flow, audience)
+      case 'structure':
+        return <div className="empty-analysis">Structure analysis coming soon</div>;
+        
+      case 'flow':
+        return <div className="empty-analysis">Flow analysis coming soon</div>;
+        
+      case 'audience':
+        return <div className="empty-analysis">Audience analysis coming soon</div>;
+        
+      default:
+        return <div className="empty-analysis">Select an analysis tab</div>;
     }
   };
 
@@ -42,17 +54,32 @@ const AnalysisTabs = ({ focusItem, selectedAIModel, onModelChange, onJokeUpdate 
           className={activeTab === 'polish' ? 'active' : ''}
           onClick={() => setActiveTab('polish')}
         >
-          Polish & Optimize {/* Renamed tab? */}
+          Polish & Optimize
         </button>
-        {/* Add new button if separate tab:
         <button 
-          className={activeTab === 'optimizer' ? 'active' : ''}
-          onClick={() => setActiveTab('optimizer')}
+          className={activeTab === 'analysis' ? 'active' : ''}
+          onClick={() => setActiveTab('analysis')}
         >
-          Optimizer 
+          Joke Analysis
         </button>
-        */}
-        {/* ... other buttons */}
+        <button 
+          className={activeTab === 'structure' ? 'active' : ''}
+          onClick={() => setActiveTab('structure')}
+        >
+          Structure
+        </button>
+        <button 
+          className={activeTab === 'flow' ? 'active' : ''}
+          onClick={() => setActiveTab('flow')}
+        >
+          Flow
+        </button>
+        <button 
+          className={activeTab === 'audience' ? 'active' : ''}
+          onClick={() => setActiveTab('audience')}
+        >
+          Audience
+        </button>
       </div>
       
       <div className="analysis-tab-content">

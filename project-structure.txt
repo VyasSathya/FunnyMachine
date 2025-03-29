@@ -1,14 +1,5 @@
-# Project Structure: styles
-# Generated on: 03/26/2025 00:12:49
-
-|   |   +-- Analysis.css
-|   |   +-- AnalysisTabs.css
-|   |   +-- AnalyzeSection.css
-|   |   +-- BlockComponent.css
-|   |   +-- OrganizedMaterial.css
-|   +-- utils
 # Project Structure: utils
-# Generated on: 03/26/2025 00:12:49
+# Generated on: 03/29/2025 10:01:54
 
 |   +-- App.css
 |   +-- App.js
@@ -18,10 +9,27 @@
 |   +-- logo.svg
 |   +-- reportWebVitals.js
 |   +-- setupTests.js
++-- uploads
+# Project Structure: uploads
+# Generated on: 03/29/2025 10:01:55
+
+|   +-- 1742997609829-The Swinginâ Door 3.m4a
+|   +-- 1742997693915-The Swinginâ Door 3.m4a
+|   +-- 1742997699662-The Swinginâ Door 3.m4a
+|   +-- 1742997751936-The Swinginâ Door 3.m4a
+|   +-- 1742997773080-The Swinginâ Door 3.m4a
+|   +-- 1742997775908-The Swinginâ Door 3.m4a
+|   +-- 1743017779651-The Swinginâ Door 3.m4a
+|   +-- 1743017786414-The Swinginâ Door 3.m4a
+|   +-- 1743017788295-The Swinginâ Door 3.m4a
+|   +-- 1743018173022-The Swinginâ Door 3.m4a
++-- .env
 +-- .gitignore
 +-- package.json
 +-- project-status-script.ps1
 +-- project-structure.txt
 +-- README.md
++-- server.js
 +-- setup-script.ps1
 +-- setup2.ps1
++-- whisperTranscriber.js

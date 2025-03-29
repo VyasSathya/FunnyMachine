@@ -2,6 +2,17 @@
   "name": "comedy-construction-engine",
   "version": "0.1.0",
   "private": true,
+  "main": "server.js",
+  "description": "A tool for building and analyzing comedy material across multiple levels:\r - Level 1: Jokes - atomic humor units\r - Level 2: Bits - collections of related jokes\r - Level 3: Sets - arranged bits with transitions\r - Level 4: Specials - complete themed performances",
+  "scripts": {
+    "start": "react-scripts start",
+    "start-server": "node server.js",
+    "convert-data": "node scripts/convert-existing-data.js data/raw/jokes_with_ai_analysis.jsonl",
+    "analyze": "node scripts/analyze-jokes.js",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@google/generative-ai": "^0.24.0",
@@ -9,6 +20,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -18,12 +30,6 @@
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
@@ -37,8 +43,6 @@
       "last 1 safari version"
     ]
   },
-  "description": "A tool for building and analyzing comedy material across multiple levels:\r - Level 1: Jokes - atomic humor units\r - Level 2: Bits - collections of related jokes\r - Level 3: Sets - arranged bits with transitions\r - Level 4: Specials - complete themed performances",
-  "main": "server.js",
   "keywords": [],
   "author": "",
   "license": "ISC"
