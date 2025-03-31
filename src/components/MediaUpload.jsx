@@ -28,36 +28,49 @@ const MediaUpload = ({ onUploadComplete }) => {
         if (event.target) event.target.value = null;
     };
 
-    // Handles the upload process (currently placeholder)
+    // Handles the upload process
     const handleUpload = async (file) => {
         setIsUploading(true);
         setError('');
         setUploadProgress(0);
 
-        // --- Placeholder for Backend Transcription API Call ---
-        // 1. Upload the file (e.g., using FormData) to your backend '/api/transcribe' endpoint.
-        // 2. Backend sends file to transcription service (e.g., AssemblyAI).
-        // 3. Backend polls service or uses webhooks for results.
-        // 4. Backend sends results back to frontend, or frontend gets them via another request.
+        const formData = new FormData();
+        formData.append('mediaFile', file); // Key must match multer setup ('mediaFile')
 
         try {
             console.log(`Uploading file: ${file.name}, Size: ${file.size}`);
 
-            // --- Simulate Upload & Transcription ---
-            for (let p = 0; p <= 100; p += 15) { // Simulate progress
-                setUploadProgress(p);
-                await new Promise(res => setTimeout(res, 100));
-            }
-            setUploadProgress(100);
-            console.log("Simulating transcription process...");
-            await new Promise(res => setTimeout(res, 2500 + Math.random() * 2000)); // Simulate delay
+            // Use axios or fetch to send the file to the backend
+            const response = await fetch('http://localhost:3001/api/upload-media', {
+                method: 'POST',
+                body: formData,
+                // Optional: Add progress tracking using XMLHttpRequest if needed
+                // onUploadProgress: (progressEvent) => {
+                //     const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                //     setUploadProgress(percentCompleted);
+                // }
+            });
 
-            // Simulate receiving results
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || `HTTP error! status: ${response.status}`);
+            }
+
+            console.log('Upload successful:', result);
+            setUploadProgress(100); // Mark as complete
+
+            // --- TODO: Trigger Transcription --- 
+            // Now that the file is uploaded, we can trigger the next step (transcription).
+            // We'll pass the 'result.filename' to the transcription process.
+            // For now, we can simulate the rest or call the onUploadComplete callback.
+
+            console.log("File uploaded, placeholder for transcription call...");
+
+            // Simulate receiving results (replace with actual transcription call later)
             const mockTranscriptionResult = {
-                transcription: `Simulated transcription for ${file.name}. The quick brown fox jumps over the lazy dog. Laughter occurred here, perhaps. And then more talking.`,
-                // Optional: Include structured timestamp data if service provides it
-                // words: [ { text: "The", start_ms: 100, end_ms: 300 }, ... ],
-                // laughter_timestamps: [ { start_s: 5.2, end_s: 6.8, confidence: 0.9 } ]
+                sourceFilename: result.filename, // Include filename for reference
+                transcription: `Simulated transcription for ${result.originalName}. The quick brown fox jumps over the lazy dog. Laughter occurred here, perhaps. And then more talking.`,
             };
             console.log("Transcription complete (simulated).");
 
@@ -68,11 +81,12 @@ const MediaUpload = ({ onUploadComplete }) => {
             // --- End Simulation ---
 
         } catch (err) {
-            console.error("Upload/Transcription failed:", err);
-            setError('Upload or transcription failed. Please try again.');
+            console.error("Upload failed:", err);
+            setError(err.message || 'Upload failed. Please try again.');
+            setUploadProgress(0); // Reset progress on error
         } finally {
             setIsUploading(false);
-            setUploadProgress(0);
+            // Don't reset progress here if successful, maybe reset after a short delay or action
         }
     };
 

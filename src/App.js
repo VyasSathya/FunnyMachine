@@ -6,6 +6,9 @@ import MediaUpload from "./components/MediaUpload.jsx";
 import OrganizedMaterialEditor from "./components/InputPanel/OrganizedMaterialEditor.jsx"; // Renamed for clarity
 import PunchlineOptimizer from './components/Tools/PunchlineOptimizer';
 import JokeAnalysis from './components/Analysis/JokeAnalysis'; // Import the JokeAnalysis component
+import RawTextImporter from './components/InputPanel/RawTextImporter.jsx'; // <-- Import the new component
+import JokeBuilder from './components/InputPanel/JokeBuilder.jsx'; // <-- Import JokeBuilder
+import JokeEditor from './components/EditorPanel/JokeEditor.jsx'; // <-- Import JokeEditor
 
 // --- Constants ---
 const availableModels = [ "gpt-4", "gpt-3.5-turbo", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "gemini-pro" ];
@@ -37,19 +40,25 @@ export default function App() {
   const defaultModel = availableModels.length > 0 ? availableModels[0] : "default-model-placeholder";
   // --- State ---
   const [library, setLibrary] = useState([]);
-  const [activeLibCategory, setActiveLibCategory] = useState("joke");
+  const [activeLibCategory, setActiveLibCategory] = useState("all");
+  const [librarySearchTerm, setLibrarySearchTerm] = useState("");
   const [focusItem, setFocusItem] = useState(null);
   const [activeMainTab, setActiveMainTab] = useState("builder");
   const [analysisMode, setAnalysisMode] = useState(false);
   const [selectedAnalysisModel, setSelectedAnalysisModel] = useState(defaultModel);
   const [activeAiAction, setActiveAiAction] = useState(null);
   // Removed aiActionResults as results are handled within tools
-  const [rightPanelTab, setRightPanelTab] = useState('process');
+  const [rightPanelTab, setRightPanelTab] = useState('import');
   const [transcriptionText, setTranscriptionText] = useState("");
   const [organizedResultForReview, setOrganizedResultForReview] = useState(null);
   const [isOrganizing, setIsOrganizing] = useState(false);
   const [newIdeaText, setNewIdeaText] = useState("");
   const [lastError, setLastError] = useState("");
+  const [isAnalyzingSelection, setIsAnalyzingSelection] = useState(false);
+  const [jokeBuilderData, setJokeBuilderData] = useState(null);
+  const [isParsingFullText, setIsParsingFullText] = useState(false);
+  const [textSuggestions, setTextSuggestions] = useState(null);
+  const [editingJokeItem, setEditingJokeItem] = useState(null);
 
   // --- Effects ---
    useEffect(() => { // Load initial data
@@ -227,8 +236,400 @@ export default function App() {
   const exitAnalysisMode = () => { setAnalysisMode(false);setActiveMainTab('builder');setActiveAiAction(null);};
   const handleAiActionClick = (actionName) => { setActiveAiAction(actionName);};
 
+  // Handler for analyzing selected text
+  const handleAnalyzeSelection = useCallback(async (selectedText) => {
+    if (!selectedText) return;
+    console.log("App.js: Received selected text for analysis:", selectedText);
+    setLastError('Analyzing selection...');
+    setIsAnalyzingSelection(true);
+    setJokeBuilderData(null); // Clear previous builder data
+
+    try {
+      // --- Call the new backend endpoint --- 
+      const response = await fetch('http://localhost:3001/api/analyze-selection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          text: selectedText,
+          // Optionally pass the selected model from UI state later
+          // model: selectedAnalysisModel 
+        }),
+      });
+
+      const analysisResult = await response.json();
+
+      if (!response.ok) {
+        throw new Error(analysisResult.error || `HTTP error! Status: ${response.status}`);
+      }
+
+      console.log("Backend analysis result:", analysisResult);
+
+      // --- Open Joke Builder UI with real data --- 
+      setJokeBuilderData(analysisResult); // Contains originalSelection, suggestedSetup, etc.
+      setLastError('AI analysis complete. Review suggestions.');
+
+    } catch (error) {
+      console.error("Error analyzing selection:", error);
+      setLastError(`Analysis failed: ${error.message}`);
+      setJokeBuilderData(null);
+    } finally {
+      setIsAnalyzingSelection(false);
+    }
+  // TODO: Add selectedAnalysisModel to dependency array if used in fetch
+  }, []); // Add dependencies like selectedAnalysisModel if needed
+
+  // Handler for analyzing FULL text block (Populates focusItem with suggestions)
+  const handleAnalyzeFullText = useCallback(async (fullText) => {
+    if (!fullText) return;
+    console.log("App.js: Analyzing full text block...");
+    setLastError('Parsing text for jokes...');
+    setIsParsingFullText(true);
+    // setTextSuggestions(null); // No longer needed
+    // setJokeBuilderData(null); // No longer needed
+    setEditingJokeItem(null); // Ensure editor is closed
+    setFocusItem(null); // Clear focus before loading suggestions
+
+    try {
+      const response = await fetch('http://localhost:3001/api/parse-text-for-jokes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: fullText }),
+      });
+      // ... check response, handle errors ...
+      const result = await response.json();
+      if (!response.ok) { throw new Error(result.error || `HTTP error! Status: ${response.status}`); }
+
+      console.log("Backend parsing result:", result.suggestions);
+      
+      if (result.suggestions && result.suggestions.length > 0) {
+        // Create temporary suggestion items
+        const suggestionItems = result.suggestions.map((suggestion, index) => ({
+          id: `suggestion-${Date.now()}-${index}`, // Temporary ID
+          type: 'joke', // Treat as joke type for styling/logic
+          status: 'suggestion', // Special status flag
+          label: `Suggestion ${index + 1}`, // Temporary label
+          text: `${suggestion.suggestedSetup || ''}\n${suggestion.suggestedPunchline || ''}`,
+          analysis: {
+            structure: {
+              setup: suggestion.suggestedSetup || '',
+              punchline: suggestion.suggestedPunchline || ''
+            }
+          },
+          tags: suggestion.suggestedTags || [],
+          _originalSnippet: suggestion.originalSnippet || null // Keep context
+        }));
+
+        // Create a temporary focus item to hold these suggestions
+        const tempFocus = {
+          id: 'suggestions-root',
+          type: 'bit', // Represent the group as a temporary bit?
+          label: 'Parsed Joke Suggestions',
+          children: suggestionItems,
+          // Add flag to indicate this is temporary?
+          _isSuggestionRoot: true 
+        };
+        setFocusItem(tempFocus); // Set this temporary item as the focus
+        setActiveMainTab('builder'); // Switch to builder view
+        setLastError(`Found ${suggestionItems.length} suggestions. Review and Approve/Edit/Reject below.`);
+      } else {
+        setLastError('No distinct jokes found by AI.');
+        setFocusItem(null); // Ensure focus is clear if no suggestions
+      }
+
+    } catch (error) {
+      console.error("Error parsing full text:", error);
+      setLastError(`Parsing failed: ${error.message}`);
+      setFocusItem(null);
+    } finally {
+      setIsParsingFullText(false);
+    }
+  }, [/* dependencies */ setFocusItem, setLastError, setIsParsingFullText, setEditingJokeItem, setActiveMainTab]); // Added deps
+
+  // --- RE-ADD: Handler for clicking a suggestion from the list ---
+  const handleSuggestionClick = useCallback((suggestion) => {
+    console.log("Suggestion clicked, loading middle panel editor:", suggestion);
+    // Prepare data for the middle panel Editor (mark as new by omitting ID)
+    const editorDataForNewJoke = {
+      type: 'joke', 
+      label: `New Joke from Suggestion...`, 
+      analysis: { structure: { setup: suggestion.suggestedSetup || '', punchline: suggestion.suggestedPunchline || '' } },
+      tags: suggestion.suggestedTags || [],
+      _originalSnippet: suggestion.originalSnippet || null 
+    };
+    setEditingJokeItem(editorDataForNewJoke); // Set state for middle panel editor
+    setTextSuggestions(null); // Hide suggestions list
+    setLastError('Reviewing AI suggestion. Edit and save as new joke.');
+  }, [setEditingJokeItem, setTextSuggestions, setLastError]); // Dependencies
+
+  // --- UPDATED: Handler for edit request from BlockComponent ---
+  // Renamed from handleEditJokeRequest
+  const handleEditItem = useCallback((itemToEdit) => {
+    console.log("App.js: Inline edit started for item:", itemToEdit.id);
+    setLastError('Editing item inline...');
+    setJokeBuilderData(null); 
+    setTextSuggestions(null);
+    // We actually don't need to set editingJokeItem here, BlockComponent handles its own state
+  }, [setLastError, setJokeBuilderData, setTextSuggestions]);
+
+  // --- NEW: Handler for starting edit on a SUGGESTION (optional, for notification) ---
+  const handleEditSuggestion = useCallback((suggestionItem) => {
+    console.log("App.js: Inline edit started for suggestion:", suggestionItem.id);
+    setLastError('Editing suggestion inline...');
+    setJokeBuilderData(null);
+    setTextSuggestions(null);
+  }, [setLastError, setJokeBuilderData, setTextSuggestions]);
+  
+  // --- Moved UP: Handler to save NEW joke ---
+  const handleSaveJokeFromBuilder = useCallback((newJokePayload) => {
+    const now = newJokePayload.timestamp || new Date().toISOString();
+    const initialText = `${newJokePayload.setup || ''}\n${newJokePayload.punchline || ''}`;
+    const firstVersion = {
+      id: `version-${now}-${Math.random().toString(16).slice(2)}`,
+      timestamp: now,
+      setup: newJokePayload.setup || '',
+      punchline: newJokePayload.punchline || '',
+      tags: newJokePayload.tags || [],
+      source_selection: newJokePayload.source_selection
+    };
+    const finalJoke = {
+      id: `joke-${now}-${Math.random().toString(16).slice(2)}`,
+      type: 'joke',
+      label: `Joke (${(newJokePayload.setup || newJokePayload.punchline).substring(0, 15)}...)`,
+      text: initialText, 
+      canonicalText: initialText, 
+      analysis: { structure: { setup: newJokePayload.setup || '', punchline: newJokePayload.punchline || '' } },
+      tags: newJokePayload.tags || [],
+      metadata: { creation_date: now, last_modified: now, is_starred: false },
+      versions: [firstVersion]
+    };
+    console.log("Saving new joke:", finalJoke);
+    setLibrary(currentLibrary => {
+        if (currentLibrary.some(item => item.id === finalJoke.id)) {
+            console.warn(`Joke with ID ${finalJoke.id} already exists.`);
+            return currentLibrary;
+        }
+        return [...currentLibrary, finalJoke];
+    });
+    setLastError(`Joke "${finalJoke.label}" saved successfully!`);
+    setActiveLibCategory('joke');
+    setTimeout(() => setLastError(""), 4000);
+  }, [setLibrary, setLastError, setActiveLibCategory]); 
+
+  // --- Handler to APPROVE a suggestion ---
+  const handleApproveSuggestion = useCallback((suggestionData) => {
+    console.log("App.js: Approving suggestion:", suggestionData);
+    const jokePayload = {
+        setup: suggestionData.setup || suggestionData.analysis?.structure?.setup || '',
+        punchline: suggestionData.punchline || suggestionData.analysis?.structure?.punchline || '',
+        tags: suggestionData.tags || [],
+        timestamp: suggestionData.timestamp || new Date().toISOString(),
+        source_selection: suggestionData._originalSnippet || null
+    };
+    // Calls the function defined above
+    handleSaveJokeFromBuilder(jokePayload); 
+    // Remove suggestion from the temporary focus list
+    setFocusItem(currentFocus => {
+        if (!currentFocus || !currentFocus._isSuggestionRoot) return currentFocus;
+        const updatedChildren = (currentFocus.children || []).filter(child => child.id !== suggestionData.id);
+        if (updatedChildren.length === 0) return null;
+        return { ...currentFocus, children: updatedChildren };
+    });
+  // Now the dependency is defined before this function
+  }, [handleSaveJokeFromBuilder, setFocusItem]); 
+
+  // --- Handler to REJECT a suggestion ---
+  const handleRejectSuggestion = useCallback((suggestionId) => {
+    console.log("App.js: Rejecting suggestion:", suggestionId);
+    setFocusItem(currentFocus => {
+        if (!currentFocus || !currentFocus._isSuggestionRoot) return currentFocus;
+        const updatedChildren = (currentFocus.children || []).filter(child => child.id !== suggestionId);
+        if (updatedChildren.length === 0) return null;
+        return { ...currentFocus, children: updatedChildren };
+    });
+    setLastError('Suggestion rejected.');
+    setTimeout(() => setLastError(""), 2000);
+  }, [setFocusItem, setLastError]);
+
+  // Handler to UPDATE existing joke (from inline editor) 
+  const handleUpdateItemInline = useCallback((updatedData) => {
+    const { jokeId } = updatedData;
+    console.log(`App.js: Updating joke ID from inline editor: ${jokeId}`);
+    setLibrary(currentLibrary => {
+      // ... existing logic to find joke, create version, update library ...
+      const jokeIndex = currentLibrary.findIndex(item => item.id === jokeId && item.type === 'joke');
+      if (jokeIndex === -1) { /* error */ return currentLibrary; }
+      const updatedLibrary = [...currentLibrary];
+      const originalJoke = updatedLibrary[jokeIndex];
+      const now = updatedData.timestamp || new Date().toISOString();
+      const newVersion = { /* ... */ };
+      const updatedJoke = { /* ... */ };
+      updatedLibrary[jokeIndex] = updatedJoke;
+      return updatedLibrary;
+    });
+    setLastError(`Joke updated successfully!`);
+    setTimeout(() => setLastError(""), 4000);
+  }, [setLibrary, setLastError]);
+
+  // Handler to set the canonical text for a joke 
+  const handleSetCanonicalText = useCallback((jokeId, versionText, versionTimestamp) => {
+    if (!jokeId || typeof versionText !== 'string') return;
+
+    console.log(`Setting canonical text for joke ${jokeId} from version ${versionTimestamp}`);
+    
+    setLibrary(currentLibrary => {
+      const jokeIndex = currentLibrary.findIndex(item => item.id === jokeId && item.type === 'joke');
+      if (jokeIndex === -1) {
+        console.error(`Set Canonical Error: Joke with ID ${jokeId} not found.`);
+        setLastError('Failed to set canonical text: Joke not found.');
+        return currentLibrary; 
+      }
+
+      const updatedLibrary = [...currentLibrary];
+      const originalJoke = updatedLibrary[jokeIndex];
+
+      // Update only the canonicalText and last_modified
+      const updatedJoke = {
+        ...originalJoke,
+        canonicalText: versionText,
+        metadata: {
+          ...originalJoke.metadata,
+          last_modified: new Date().toISOString(), // Update modified time
+        },
+      };
+
+      updatedLibrary[jokeIndex] = updatedJoke;
+      return updatedLibrary;
+    });
+
+    // Optionally update focusItem if it's the one being changed
+    setFocusItem(currentFocus => {
+        if (currentFocus && currentFocus.id === jokeId) {
+            return { ...currentFocus, canonicalText: versionText, metadata: { ...currentFocus.metadata, last_modified: new Date().toISOString() } };
+        }
+        return currentFocus;
+    });
+
+    setLastError(`Canonical text updated for joke.`);
+    setTimeout(() => setLastError(""), 3000);
+
+  }, [setLibrary, setFocusItem, setLastError]);
+
   // --- Render Functions ---
+  const renderFilteredLibraryItems = () => {
+    let items = library;
+
+    // 1. Filter by Category (if not 'all')
+    if (activeLibCategory !== "all") {
+      items = items.filter(item => item.type === activeLibCategory);
+    }
+
+    // 2. Filter by Search Term (if any)
+    if (librarySearchTerm.trim()) {
+      const searchTermLower = librarySearchTerm.toLowerCase();
+      items = items.filter(item => 
+        (item.label && item.label.toLowerCase().includes(searchTermLower)) ||
+        (item.text && item.text.toLowerCase().includes(searchTermLower)) ||
+        (item.analysis?.structure?.setup && item.analysis.structure.setup.toLowerCase().includes(searchTermLower)) ||
+        (item.analysis?.structure?.punchline && item.analysis.structure.punchline.toLowerCase().includes(searchTermLower))
+      );
+    }
+
+    if (items.length === 0) {
+       return <div className="library-empty">No items found{librarySearchTerm.trim() ? ' for "' + librarySearchTerm + '"' : ''}.</div>;
+    }
+
+    return items.map(item => ( 
+      <button 
+        key={item.id} 
+        className={`btn library-item ${focusItem?.id === item.id ? 'focused' : ''}`} // Add focused class
+        style={{ borderLeftColor: typeColors[item.type] || typeColors.default }} 
+        draggable 
+        onDragStart={(e) => handleDragStart(e, item)} 
+        onClick={() => setFocusItem(structuredClone(item)) }
+        title={item.label || '(Untitled)'}
+      >
+        {item.label || '(Untitled)'}
+      </button> 
+    ));
+  };
+
   const renderTextTab = () => { if(!focusItem)return<div className="tool-desc">No item</div>; const l=[];const ex=(i)=>{if(!i)return; if(i.text&&(i.type==='joke'||i.type==='bit'))l.push(i.text); i.children?.forEach(ex);}; ex(focusItem); return<pre className="text-readout">{l.join("\n\n")||"(No text)"}</pre>;};
+
+  // --- UPDATED: Render Versions Tab ---
+  const renderVersionsTab = () => {
+    if (!focusItem || !focusItem.versions || focusItem.versions.length === 0) {
+      return <div className="tool-desc">No version history available for this item.</div>;
+    }
+    
+    const sortedVersions = [...focusItem.versions].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const currentCanonicalText = focusItem.canonicalText;
+
+    return (
+      <div className="versions-list" style={{ padding: '15px', overflowY: 'auto', height: 'calc(100% - 30px)' }}>
+        <h4>Version History ({sortedVersions.length})</h4>
+        <div style={{ marginBottom: '15px', padding: '10px', background: '#fff8dc', border: '1px solid #eee', borderRadius: '4px'}}>
+            <strong style={{fontSize: '0.9em'}}>Canonical Text (for matching):</strong>
+            <p style={{ margin: '5px 0 0 5px', whiteSpace: 'pre-wrap', fontStyle: 'italic' }}>{currentCanonicalText || '(Not Set)'}</p>
+        </div>
+
+        {sortedVersions.map((version, index) => {
+          const versionText = `${version.setup || ''}\n${version.punchline || ''}`;
+          const isCanonical = versionText === currentCanonicalText;
+          
+          return (
+            <div 
+              key={version.id || `version-${index}`} 
+              style={{
+                marginBottom: '15px', 
+                padding: '10px', 
+                border: '1px solid #ccc', 
+                borderRadius: '5px', 
+                background: index === 0 ? '#f0fff0' : '#f9f9f9' // Highlight latest
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <strong style={{ fontSize: '0.9em' }}>
+                  Version {sortedVersions.length - index}
+                  {index === 0 && <span style={{ marginLeft: '8px', color: 'green', fontWeight: 'bold' }}>(Latest)</span>}
+                </strong>
+                <span style={{ fontSize: '0.8em', color: '#555' }}>
+                  {new Date(version.timestamp).toLocaleString()} 
+                </span>
+              </div>
+              <div style={{ marginBottom: '5px' }}>
+                <label style={{ fontWeight: '600', fontSize: '0.85em' }}>Setup:</label>
+                <p style={{ margin: '2px 0 0 5px', whiteSpace: 'pre-wrap' }}>{version.setup || '-'}</p>
+              </div>
+              <div style={{ marginBottom: '5px' }}>
+                <label style={{ fontWeight: '600', fontSize: '0.85em' }}>Punchline:</label>
+                <p style={{ margin: '2px 0 0 5px', whiteSpace: 'pre-wrap' }}>{version.punchline || '-'}</p>
+              </div>
+              {version.tags && version.tags.length > 0 && (
+                <div style={{ marginTop: '8px', fontSize: '0.85em' }}>
+                  <label style={{ fontWeight: '600'}}>Tags:</label>
+                  <span style={{ marginLeft: '5px' }}>{version.tags.join(', ')}</span>
+                </div>
+              )}
+              <div style={{ marginTop: '10px' }}>
+                  <button 
+                      className="btn btn-small" 
+                      onClick={() => handleSetCanonicalText(focusItem.id, versionText, version.timestamp)}
+                      disabled={isCanonical}
+                      title={isCanonical ? "This version is the current canonical text" : "Set this version\'s text as the canonical version for matching"}
+                  >
+                      {isCanonical ? '✅ Is Canonical' : 'Set as Canonical Text'}
+                  </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   // --- Main JSX ---
   return (
@@ -237,79 +638,180 @@ export default function App() {
       {/* Left Panel */}
       <div className="left-panel">
         <h2>📚 Library</h2>
-        <div className="tab-buttons category-buttons"> {categories.map(cat => ( <button key={cat} className={`btn btn-category ${cat === activeLibCategory ? "active" : ""}`} onClick={() => setActiveLibCategory(cat)}>{cat.charAt(0).toUpperCase() + cat.slice(1)}s</button> ))} </div>
+        <div className="tab-buttons category-buttons">
+           <button key="all" className={`btn btn-category ${activeLibCategory === 'all' ? "active" : ""}`} onClick={() => setActiveLibCategory('all')}>All</button>
+           {categories.map(cat => ( <button key={cat} className={`btn btn-category ${cat === activeLibCategory ? "active" : ""}`} onClick={() => setActiveLibCategory(cat)}>{cat.charAt(0).toUpperCase() + cat.slice(1)}s</button> ))} 
+        </div>
+        <div className="library-search" style={{ padding: '5px 0 10px 0' }}>
+            <input 
+                type="text"
+                placeholder={`Search ${activeLibCategory === 'all' ? 'all items' : activeLibCategory + 's'}...`}
+                value={librarySearchTerm}
+                onChange={(e) => setLibrarySearchTerm(e.target.value)}
+                style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px' }}
+            />
+        </div>
         <div className="library-items">
-          {library.filter(item => item.type === activeLibCategory).map(item => ( <button key={item.id} className="btn library-item" style={{ borderLeftColor: typeColors[item.type] || typeColors.default }} draggable onDragStart={(e) => handleDragStart(e, item)} onClick={() => setFocusItem(structuredClone(item)) }>{item.label || '(Untitled)'}</button> )) }
-          {library.filter(item => item.type === activeLibCategory).length === 0 && ( <div className="library-empty">No {activeLibCategory}s.</div> )}
+          {renderFilteredLibraryItems()}
         </div>
         <button className="btn refresh-btn" onClick={refreshLibrary}>🔄 Reset Library</button>
       </div>
 
       {/* Middle Panel */}
       <div className="middle-panel">
+        {/* --- UPDATED Focus Bar --- */}
         <div className="focus-bar drop-zone" onDragOver={(e) => {e.preventDefault(); e.dataTransfer.dropEffect = "move";}} onDrop={handleFocusDrop}>
-           <h3>🎯 Focused Material</h3>
-           {focusItem ? ( <div className="focus-item-display"> <span><strong>{focusItem.label || '(Untitled)'}</strong> ({focusItem.type})</span> {!analysisMode && ( <button onClick={enterAnalysisMode} className="btn analyze-btn-global">Analyze ✨</button> )} </div> ) : ( <div className="focus-placeholder">Drag item here</div> )}
+           <h3>🎯 {editingJokeItem ? 'Editing Joke' : 'Focused Material'}</h3>
+           {editingJokeItem ? (
+              // Show label of joke being edited
+              <div className="focus-item-display"> 
+                 <span><strong>{editingJokeItem.label || '(Untitled)'}</strong> ({editingJokeItem.type})</span>
+              </div>
+           ) : focusItem ? (
+              // Original display for focused item
+              <div className="focus-item-display"> 
+                 <span><strong>{focusItem.label || '(Untitled)'}</strong> ({focusItem.type})</span> 
+                 {!analysisMode && ( <button onClick={enterAnalysisMode} className="btn analyze-btn-global">Analyze ✨</button> )} 
+              </div> 
+           ) : (
+              // Placeholder if nothing focused or editing 
+              <div className="focus-placeholder">{analysisMode ? 'Analysis Mode' : 'Drag item here or select suggestion'}</div> 
+           )}
         </div>
+
+        {/* --- UPDATED Middle Panel Content --- */}
         <div className="middle-panel-content">
-          {analysisMode ? (
-            <div className="analysis-view">
-              <div className="analysis-header"> <h3>Analyzing {focusItem?.type}: "{focusItem?.label || 'Untitled'}"</h3> <button onClick={exitAnalysisMode} className="btn back-btn">← Back</button> </div>
-              <div className="analysis-controls">
-                  <label htmlFor="model-select">AI Model:</label>
-                  <select id="model-select" value={selectedAnalysisModel} onChange={(e) => setSelectedAnalysisModel(e.target.value)} className="ai-model-select"> <optgroup label="OpenAI"><option value="gpt-4">GPT-4</option><option value="gpt-3.5-turbo">GPT-3.5-Turbo</option></optgroup> <optgroup label="Anthropic"><option value="claude-3-opus-20240229">Claude 3 Opus</option><option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option></optgroup> <optgroup label="Google"><option value="gemini-pro">Gemini Pro</option></optgroup> </select>
+          {/* Always show TABS unless in Analysis Mode */} 
+          {!analysisMode && (
+              <div className="tab-buttons-container standard-tabs">
+                  {["builder", "text", "versions"].map(tab => (
+                      <button 
+                          key={tab} 
+                          className={`btn tab-btn ${activeMainTab === tab ? "active" : ""}`} 
+                          onClick={() => {
+                              setActiveMainTab(tab);
+                              // If switching tabs while editing, cancel edit?
+                              // Or keep editor active regardless of tab? For now, keep active.
+                              // if (editingJokeItem) setEditingJokeItem(null); 
+                          }}
+                          // Disable other tabs while editing? Or allow switching?
+                          // disabled={editingJokeItem && activeMainTab !== tab} 
+                      >
+                          {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      </button>
+                  ))}
               </div>
-              <div className="analysis-actions">
-                  {(improvementActionsConfig[focusItem?.type] || []).map(actionName => ( <button key={actionName} className={`btn ai-action-btn ${activeAiAction === actionName ? 'active' : ''}`} onClick={() => handleAiActionClick(actionName)}>{actionName}</button> )) }
-                  {(improvementActionsConfig[focusItem?.type] || []).length === 0 && <p>No analysis actions for '{focusItem?.type}'.</p>}
-              </div>
-              <div className="analysis-results-area">
-                   {activeAiAction === 'Punchline Optimizer' && focusItem && ( <PunchlineOptimizer jokeItem={focusItem} selectedModel={selectedAnalysisModel} /> )}
-                   {activeAiAction === 'Joke Analysis' && focusItem && (
-                     <JokeAnalysis jokeText={focusItem.text} />
-                   )}
-                   {activeAiAction && activeAiAction !== 'Punchline Optimizer' && activeAiAction !== 'Joke Analysis' && ( <div>{activeAiAction} results using {selectedAnalysisModel}... (Tool Component Placeholder)</div> )}
-                   {!activeAiAction && <div className="tool-desc">Select action above.</div>}
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="tab-buttons-container standard-tabs"> {["builder", "text", "versions"].map(tab => ( <button key={tab} className={`btn tab-btn ${activeMainTab === tab ? "active" : ""}`} onClick={() => setActiveMainTab(tab)}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</button>))} </div>
-              <div className="tab-content">
-                  {/* Ensure ALL necessary props including handlers and typeColors are passed down */}
-                  {activeMainTab === 'builder' && ( focusItem ? <div className="builder-area drop-zone"><BlockComponent item={focusItem} level={0} onDropChild={handleDropIntoChild} onRemoveChild={handleRemoveChild} onDragStart={handleDragStart} onReorder={handleReorder} parent={null} typeColors={typeColors} /></div> : <div className="tool-desc">Focus an item</div> )}
-                  {activeMainTab === 'text' && renderTextTab()}
-                  {activeMainTab === 'versions' && <div className="tool-desc">Versions (placeholder)</div>}
-              </div>
-            </>
           )}
+
+          {/* Main content area - renders Editor OR Tab Content OR Analysis */}
+          <div className="tab-content" style={{ borderTop: !analysisMode ? '1px solid #ccc' : 'none', paddingTop: !analysisMode ? '15px' : '0' }}>
+            {/* --- REMOVED Outer Editor Check --- */}
+            {/* {editingJokeItem ? ( ... ) : ... } */} 
+            
+            {/* --- ALWAYS Render based on Tab (or Analysis Mode) --- */}
+             {analysisMode ? (
+                 <div className="analysis-view">
+                     <div className="analysis-header"> <h3>Analyzing {focusItem?.type}: "{focusItem?.label || 'Untitled'}"</h3> <button onClick={exitAnalysisMode} className="btn back-btn">← Back</button> </div>
+                     <div className="analysis-controls">
+                         <label htmlFor="model-select">AI Model:</label>
+                         <select id="model-select" value={selectedAnalysisModel} onChange={(e) => setSelectedAnalysisModel(e.target.value)} className="ai-model-select"> <optgroup label="OpenAI"><option value="gpt-4">GPT-4</option><option value="gpt-3.5-turbo">GPT-3.5-Turbo</option></optgroup> <optgroup label="Anthropic"><option value="claude-3-opus-20240229">Claude 3 Opus</option><option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option></optgroup> <optgroup label="Google"><option value="gemini-pro">Gemini Pro</option></optgroup> </select>
+                     </div>
+                     <div className="analysis-actions">
+                         {(improvementActionsConfig[focusItem?.type] || []).map(actionName => ( <button key={actionName} className={`btn ai-action-btn ${activeAiAction === actionName ? 'active' : ''}`} onClick={() => handleAiActionClick(actionName)}>{actionName}</button> )) }
+                         {(improvementActionsConfig[focusItem?.type] || []).length === 0 && <p>No analysis actions for '{focusItem?.type}'.</p>}
+                     </div>
+                     <div className="analysis-results-area">
+                          {activeAiAction === 'Punchline Optimizer' && focusItem && ( <PunchlineOptimizer jokeItem={focusItem} selectedModel={selectedAnalysisModel} /> )}
+                          {activeAiAction === 'Joke Analysis' && focusItem && (
+                            <JokeAnalysis jokeText={focusItem.text} />
+                          )}
+                          {activeAiAction && activeAiAction !== 'Punchline Optimizer' && activeAiAction !== 'Joke Analysis' && ( <div>{activeAiAction} results using {selectedAnalysisModel}... (Tool Component Placeholder)</div> )}
+                          {!activeAiAction && <div className="tool-desc">Select action above.</div>}
+                     </div>
+                 </div>
+             ) : activeMainTab === 'builder' ? (
+                 focusItem ? 
+                   <div className="builder-area drop-zone">
+                     <BlockComponent 
+                       item={focusItem} 
+                       level={0} 
+                       parent={null} 
+                       typeColors={typeColors}
+                       // Pass ALL handlers down
+                       onDropChild={handleDropIntoChild} 
+                       onRemoveChild={handleRemoveChild} 
+                       onDragStart={handleDragStart} 
+                       onReorder={handleReorder} 
+                       onEditItem={handleEditItem}           
+                       onApproveSuggestion={handleApproveSuggestion}
+                       onRejectSuggestion={handleRejectSuggestion}
+                       onEditSuggestion={handleEditSuggestion} 
+                       onUpdateItem={handleUpdateItemInline} // <-- Pass the update handler
+                     />
+                   </div> 
+                 : <div className="tool-desc">Focus an item or parse text to view builder.</div> 
+             ) : activeMainTab === 'text' ? (
+                 renderTextTab()
+             ) : activeMainTab === 'versions' ? (
+                 renderVersionsTab()
+             ) : null}
+          </div>
         </div>
         {lastError && <div className="error-message" onClick={() => setLastError("")}>⚠️ {lastError}</div>}
       </div>
 
-      {/* Right Panel */}
+      {/* Right Panel - JokeBuilder should no longer be rendered */}
       <div className="right-panel">
-        <h2>➕ Input / New</h2>
-        <div className="tab-buttons input-tabs"> <button className={`btn ${rightPanelTab==='process'?'active':''}`} onClick={()=>setRightPanelTab('process')}>Process</button> <button className={`btn ${rightPanelTab==='idea'?'active':''}`} onClick={()=>setRightPanelTab('idea')}>Quick Idea</button> </div>
-        {rightPanelTab === 'process' && (
-            <div className="input-section process-section">
-              <textarea className="transcription-box" placeholder="Paste transcription or type full text..." rows={8} value={transcriptionText} onChange={(e)=>setTranscriptionText(e.target.value)} />
-              <div className="input-buttons"> <button className="btn">🎙️ Record</button> <MediaUpload onUploadComplete={(d)=>handleTranscriptionUpload(d, 'process')} /> <button className="btn blue-btn" onClick={handleOrganizeText} disabled={!transcriptionText.trim()||isOrganizing}>{isOrganizing?'Organizing...':'✨ Organize'}</button> </div>
-              {organizedResultForReview && ( <OrganizedMaterialEditor organizedResult={organizedResultForReview} onSave={handleSaveOrganized} onCancel={()=>setOrganizedResultForReview(null)} typeColors={typeColors} /> )}
+        <h3>📥 Input / Tools</h3>
+        <div className="tab-buttons">
+          {/* Add the 'Import Text' tab button */}
+          <button className={`btn ${rightPanelTab === 'import' ? 'active' : ''}`} onClick={() => { setRightPanelTab('import'); setOrganizedResultForReview(null); setTranscriptionText(""); }}>Import Text</button>
+          <button className={`btn ${rightPanelTab === 'process' ? 'active' : ''}`} onClick={() => { setRightPanelTab('process'); setOrganizedResultForReview(null); }}>Process Media</button>
+          <button className={`btn ${rightPanelTab === 'idea' ? 'active' : ''}`} onClick={() => setRightPanelTab('idea')}>Add Idea</button>
+          {/* <button className={`btn ${rightPanelTab === 'settings' ? 'active' : ''}`} onClick={() => setRightPanelTab('settings')}>Settings</button> */}
+        </div>
+
+        <div className="right-panel-content">
+          {/* Pass handleSuggestionClick to RawTextImporter */}
+          {rightPanelTab === 'import' && !editingJokeItem && (
+            <RawTextImporter 
+              onAnalyzeFullText={handleAnalyzeFullText}
+              suggestions={textSuggestions}
+              onSuggestionClick={handleSuggestionClick}
+              isLoading={isParsingFullText}
+            />
+          )}
+          
+          {/* JOKE BUILDER IS REMOVED FROM HERE */}
+          {/* {jokeBuilderData && ( ... )} */}
+
+          {rightPanelTab === 'process' && (
+            <div className="process-tab-content">
+              <MediaUpload onUploadComplete={(data) => handleTranscriptionUpload(data, 'process')} />
+              {/* Existing process tab content */}
+              <textarea value={transcriptionText} onChange={(e) => setTranscriptionText(e.target.value)} placeholder="Paste transcription here..." rows={8} style={{ width: '100%', marginTop: '10px' }} />
+              <button className="btn blue-btn" onClick={handleOrganizeText} disabled={isOrganizing || !transcriptionText.trim()}>{isOrganizing ? 'Processing...' : '🤖 Organize Text'}</button>
+              {organizedResultForReview && (
+                <OrganizedMaterialEditor 
+                    organizedResult={organizedResultForReview} 
+                    onSave={handleSaveOrganized} 
+                    onCancel={() => setOrganizedResultForReview(null)}
+                    typeColors={typeColors}
+                 />
+              )}
             </div>
-        )}
-        {rightPanelTab === 'idea' && (
-             <div className="input-section idea-section">
-                 <h3>Add Quick Idea</h3>
-                 <textarea className="idea-input-box" placeholder="Jot down premise, observation, punchline, tag..." rows={6} value={newIdeaText} onChange={(e)=>setNewIdeaText(e.target.value)} />
-                 {/* Add Upload/Record to Idea Tab */}
-                 <div className="input-buttons idea-buttons">
-                     <button className="btn">🎙️ Record Idea</button>
-                     <MediaUpload onUploadComplete={(d)=>handleTranscriptionUpload(d, 'idea')} />
-                 </div>
-                 <button className="btn" onClick={handleAddNewIdea} disabled={!newIdeaText.trim()}>Add Idea</button>
-             </div>
-        )}
+          )}
+
+          {rightPanelTab === 'idea' && (
+            <div className="add-idea-content">
+              <textarea value={newIdeaText} onChange={(e) => setNewIdeaText(e.target.value)} placeholder="Jot down a quick idea..." rows={5} style={{ width: '100%', marginBottom: '10px' }} />
+              <MediaUpload onUploadComplete={(data) => handleTranscriptionUpload(data, 'idea')} />
+              <button className="btn blue-btn" onClick={handleAddNewIdea} disabled={!newIdeaText.trim()}>💡 Add as New Idea</button>
+            </div>
+          )}
+        </div>
+        {(isParsingFullText || isAnalyzingSelection) && <div className="status-loading">Analyzing...</div>}
+        {lastError && <div className="status-error">{lastError}</div>}
       </div>
 
     </div> // End Layout
