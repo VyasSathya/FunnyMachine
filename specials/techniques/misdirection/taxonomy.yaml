@@ -1,0 +1,93 @@
+primary_categories:
+  logical_misdirection:
+    definition: "Setup establishes logical path A, punchline follows path B but maintains logical consistency"
+    subtypes:
+      semantic_reframing:
+        definition: "Taking established concept/phrase and analyzing it from unexpected angle"
+        example: "Norm's cancer battle - reframes metaphor through literal analysis"
+        strength: "Very strong when logical connection is tight"
+      
+      perspective_shift:
+        definition: "Same situation viewed from completely different viewpoint"
+        example: "Louis CK's nut allergy - shifts from protection to natural selection"
+        strength: "Strong when new perspective is surprising but valid"
+
+  emotional_misdirection:
+    definition: "Setup establishes emotional expectation, punchline subverts emotional response"
+    subtypes:
+      tone_shift:
+        definition: "Dramatic change in emotional tone while maintaining topic"
+        example: "Dark topic -> light analysis, or vice versa"
+        strength: "Very effective for tension release"
+      
+      empathy_flip:
+        definition: "Redirecting audience empathy to unexpected target"
+        example: "Sad story about person -> sympathy for inanimate object"
+        strength: "Works well with character work"
+
+  contextual_misdirection:
+    definition: "Setup establishes context A, punchline reveals context B was relevant all along"
+    subtypes:
+      frame_shift:
+        definition: "Complete change of contextual frame"
+        example: "Personal story -> cosmic scale"
+        strength: "Strong when both frames are clearly related"
+      
+      context_merge:
+        definition: "Unexpectedly combining two separate contexts"
+        example: "Mixing technical analysis with emotional subjects"
+        strength: "Very effective when contexts seem incompatible"
+
+  meta_misdirection:
+    definition: "Misdirection that works by commenting on or analyzing its own structure"
+    subtypes:
+      metaphor_deconstruction:
+        definition: "Taking common metaphors/phrases and analyzing them literally"
+        example: "Norm's 'battle with cancer' analysis"
+        strength: "Highly sophisticated when done well"
+      
+      expectation_commentary:
+        definition: "Explicitly acknowledging and then subverting comedy expectations"
+        example: "Setting up obvious joke then commenting on its obviousness"
+        strength: "Advanced technique, requires audience awareness"
+
+technique_combinations:
+  layered_misdirection:
+    definition: "Multiple types of misdirection in single joke"
+    example: "Norm's cancer joke combines logical, emotional, and meta misdirection"
+    notes: "Requires careful balance to not overwhelm audience"
+
+  sequential_misdirection:
+    definition: "Series of misdirections building on each other"
+    example: "Multiple perspective shifts, each revealing new layer"
+    notes: "Effective for longer bits, requires strong callbacks"
+
+detection_hierarchy:
+  1: "Identify primary category (logical/emotional/contextual/meta)"
+  2: "Determine specific subtype"
+  3: "Check for combinations or layering"
+  4: "Analyze strength and sophistication level"
+
+strength_factors:
+  primary:
+    - "Logical consistency"
+    - "Surprise factor"
+    - "Clarity of connection"
+  
+  multipliers:
+    - "Multiple layers working together"
+    - "Meta-awareness"
+    - "Callback integration"
+
+training_progression:
+  1: "Simple single-category misdirection"
+  2: "Strong examples of each subtype"
+  3: "Basic combinations"
+  4: "Layered misdirection"
+  5: "Meta-misdirection and complex structures"
+
+notes:
+  - "Each type can be present in varying degrees"
+  - "Strength comes from clarity of connection, not complexity"
+  - "Meta-techniques require mastery of basic forms"
+  - "Consider audience's cognitive load with complex combinations" 

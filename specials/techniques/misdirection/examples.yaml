@@ -1,0 +1,107 @@
+logical_misdirection:
+  semantic_reframing:
+    - id: norm_macdonald_001
+      comedian: "Norm Macdonald"
+      special: "Me Doing Standup"
+      setup: "My uncle Bert was a good man... unfortunately, he lost his battle with cancer."
+      punchline: "I'm not a doctor, but I'm pretty sure if you die, the cancer dies at the same time. That's not a loss. That's a draw."
+      analysis:
+        primary_type: "semantic_reframing"
+        secondary_types: ["meta_misdirection", "emotional_misdirection"]
+        mechanics:
+          - "Reframes 'battle' metaphor through literal analysis"
+          - "Shifts emotional tone through technical perspective"
+          - "Uses logical analysis to create emotional relief"
+        strength: 0.95
+        sophistication_level: "Advanced"
+  
+  perspective_shift:
+    - id: louis_ck_001
+      comedian: "Louis C.K."
+      special: "Chewed Up"
+      setup: "Of course children who have nut allergies need to be protected..."
+      punchline: "but maybe if touching a nut kills you, you're supposed to die"
+      analysis:
+        primary_type: "perspective_shift"
+        secondary_types: ["emotional_misdirection"]
+        mechanics:
+          - "Shifts from protective to evolutionary perspective"
+          - "Maintains logical consistency while changing frame"
+        strength: 0.95
+        sophistication_level: "Advanced"
+
+emotional_misdirection:
+  tone_shift:
+    - id: dark_to_light_001
+      setup: "I've been really depressed lately..."
+      punchline: "my therapist says it's because I'm not exercising, but I think it's because I keep paying someone to tell me to exercise"
+      analysis:
+        primary_type: "tone_shift"
+        mechanics:
+          - "Shifts from serious mental health to light complaint"
+          - "Maintains topic while changing emotional weight"
+        strength: 0.85
+        sophistication_level: "Intermediate"
+
+contextual_misdirection:
+  frame_shift:
+    - id: misdirection_001
+      setup: "I'm not saying she's fat..."
+      punchline: "but when she jumped in the pool, they found water on Mars"
+      analysis:
+        primary_type: "frame_shift"
+        mechanics:
+          - "Shifts from personal to astronomical scale"
+          - "Maintains causal connection while changing context"
+        strength: 0.9
+        sophistication_level: "Intermediate"
+
+layered_examples:
+  - id: complex_001
+    setup: "My doctor told me I need to exercise more..."
+    punchline: "so I started running from my problems"
+    analysis:
+      types: ["semantic_reframing", "emotional_misdirection"]
+      mechanics:
+        - "Reframes 'running' from physical to emotional context"
+        - "Shifts from health advice to personal admission"
+      strength: 0.8
+      sophistication_level: "Intermediate"
+
+failed_examples:
+  non_sequitur:
+    - id: failed_001
+      setup: "I went to the store..."
+      punchline: "and then aliens invaded!"
+      why_it_fails: "No logical connection between contexts"
+      common_mistake: "Random context shift without bridge"
+  
+  obvious:
+    - id: failed_002
+      setup: "She said she likes tall guys..."
+      punchline: "but she's short!"
+      why_it_fails: "Contradiction too obvious, lacks surprise"
+      common_mistake: "Simple contradiction mistaken for misdirection"
+
+training_progression:
+  basic:
+    example: >
+      Setup: "I've been trying to eat healthier..."
+      Punchline: "so I only eat cake on days ending in 'y'"
+    notes: "Simple semantic reframing with clear connection"
+  
+  intermediate:
+    example: >
+      Setup: "I started taking meditation classes to find inner peace..."
+      Punchline: "turns out inner peace costs $499.99 plus tax"
+    notes: "Context merge with emotional undertone"
+  
+  advanced:
+    example: "Norm's cancer joke - see above"
+    notes: "Multiple layers working together seamlessly"
+
+notes:
+  - "Examples should be studied in order of complexity"
+  - "Pay attention to how different types can combine"
+  - "Notice how stronger examples maintain logical connections"
+  - "Study how masters layer multiple types of misdirection" 

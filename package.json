@@ -1,0 +1,24 @@
+{
+  "name": "funnymachine-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root workspace for FunnyMachine project",
+  "scripts": {
+    "// api scripts": "",
+    "api:dev": "cd api && npm run dev",
+    "api:start": "cd api && npm start",
+    "api:build": "cd api && npm run build",
+    "api:test": "cd api && npm test",
+    "api:db:setup": "cd api && npm run db:setup",
+    "// frontend scripts": "",
+    "frontend:start": "cd comedy-construction-engine && npm start",
+    "frontend:build": "cd comedy-construction-engine && npm run build",
+    "frontend:test": "cd comedy-construction-engine && npm test",
+    "// comedy engine server scripts": "",
+    "comedy-engine:start": "cd comedy-construction-engine && npm run start-server"
+  },
+  "workspaces": [
+    "api",
+    "comedy-construction-engine"
+  ]
+}

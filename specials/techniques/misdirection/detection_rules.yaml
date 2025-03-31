@@ -1,0 +1,94 @@
+# Rules for detecting misdirection in comedy
+setup_indicators:
+  linguistic_patterns:
+    - pattern: "you know how"
+      confidence: 0.7
+    - pattern: "everyone thinks"
+      confidence: 0.8
+    - pattern: "I'm not saying"
+      confidence: 0.9
+    - pattern: "the thing about"
+      confidence: 0.6
+  
+  structural_markers:
+    - type: "conventional_wisdom"
+      patterns:
+        - "always"
+        - "never"
+        - "everybody"
+        - "nobody"
+      confidence: 0.8
+    
+    - type: "expectation_building"
+      patterns:
+        - "when you"
+        - "if you"
+        - "whenever"
+      confidence: 0.7
+
+punchline_indicators:
+  transition_words:
+    - pattern: "but"
+      confidence: 0.9
+    - pattern: "actually"
+      confidence: 0.8
+    - pattern: "turns out"
+      confidence: 0.85
+    - pattern: "instead"
+      confidence: 0.7
+
+  semantic_shifts:
+    - type: "topic_change"
+      description: "Complete change in subject matter"
+      confidence: 0.9
+      
+    - type: "perspective_shift"
+      description: "Change in point of view or frame of reference"
+      confidence: 0.8
+
+validation_rules:
+  required_elements:
+    - "clear_setup"
+    - "unexpected_punchline"
+    - "logical_connection"
+  
+  timing_constraints:
+    min_setup_words: 5
+    max_setup_words: 30
+    optimal_pause_before_punchline: "0.5-1.5 seconds"
+
+scoring:
+  base_factors:
+    setup_clarity: 0.3
+    surprise_factor: 0.4
+    logical_connection: 0.3
+  
+  bonus_factors:
+    callback_potential: 0.1
+    audience_reaction_strength: 0.2
+    
+  penalties:
+    random_connection: -0.5
+    obvious_direction: -0.3
+    too_complex: -0.2
+
+detection_algorithm:
+  steps:
+    1: "Identify setup patterns"
+    2: "Look for transition markers"
+    3: "Measure semantic distance between setup and punchline"
+    4: "Verify logical connection exists"
+    5: "Check audience reaction timing"
+    
+  confidence_threshold: 0.7  # Minimum confidence to classify as misdirection
+
+common_mistakes:
+  false_positives:
+    - "Simple contradictions"
+    - "Random non-sequiturs"
+    - "Accidental topic shifts"
+  
+  false_negatives:
+    - "Subtle misdirection"
+    - "Complex multi-step misdirection"
+    - "Cultural reference-based misdirection" 

@@ -1,0 +1,185 @@
+import os
+import json
+import argparse
+import glob
+
+# Folder paths
+JSON_OUTPUTS_FOLDER = "json_outputs"   # Folder with the JSON files from the detector
+BITS_FOLDER = "segmented_bits"         # Folder to store the bit segmentation results
+TRACKLISTS_FOLDER = "tracklists"       # Folder to store tracklist templates
+
+def create_folders():
+    """Create necessary folders if they don't exist."""
+    for folder in [BITS_FOLDER, TRACKLISTS_FOLDER]:
+        os.makedirs(folder, exist_ok=True)
+        print(f"Created folder: {folder}")
+
+def create_tracklist_templates():
+    """Create empty tracklist templates for all JSON files."""
+    json_files = glob.glob(os.path.join(JSON_OUTPUTS_FOLDER, "*.json"))
+    
+    if not json_files:
+        print(f"No JSON files found in {JSON_OUTPUTS_FOLDER}")
+        return
+    
+    print(f"Found {len(json_files)} JSON files")
+    
+    for json_file in json_files:
+        base_name = os.path.basename(json_file).split('.')[0]
+        
+        # Load the JSON file to get the duration
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Try to determine the total duration
+            duration = 0
+            if "segments" in data and data["segments"]:
+                last_segment = data["segments"][-1]
+                duration = last_segment.get("end", 0)
+            
+            # Create empty tracklist template
+            tracklist = [
+                {
+                    "title": "Opening",
+                    "start_time": 0
+                },
+                {
+                    "title": "Bit 2",
+                    "start_time": duration * 0.2 if duration else 300
+                },
+                {
+                    "title": "Bit 3",
+                    "start_time": duration * 0.4 if duration else 600
+                },
+                {
+                    "title": "Bit 4",
+                    "start_time": duration * 0.6 if duration else 900
+                },
+                {
+                    "title": "Bit 5",
+                    "start_time": duration * 0.8 if duration else 1200
+                }
+            ]
+            
+            # Save the template
+            template_path = os.path.join(TRACKLISTS_FOLDER, f"{base_name}_tracklist.json")
+            with open(template_path, 'w', encoding='utf-8') as f:
+                json.dump(tracklist, f, indent=4)
+            
+            print(f"Created tracklist template: {template_path}")
+        
+        except Exception as e:
+            print(f"Error creating template for {json_file}: {e}")
+
+def segment_by_track_listing(json_file, tracklist_file):
+    """
+    Segment a comedy special based on album track listings
+    
+    Args:
+        json_file: Path to the JSON output from the detector
+        tracklist_file: Path to the tracklist JSON file
+    """
+    # Load the JSON file
+    with open(json_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    # Load the tracklist
+    with open(tracklist_file, 'r', encoding='utf-8') as f:
+        track_listing = json.load(f)
+    
+    # Get joke segments from the file
+    joke_segments = data.get("joke_segments", [])
+    
+    if not joke_segments:
+        print(f"No joke segments found in {json_file}")
+        return None
+    
+    # Sort track listing by start time
+    track_listing = sorted(track_listing, key=lambda x: x['start_time'])
+    
+    # Create bits based on track listing
+    bits = []
+    
+    for i, track in enumerate(track_listing):
+        current_start = track['start_time']
+        # If this is the last track, end_time is the end of the special
+        # Otherwise, it's the start of the next track
+        current_end = float('inf') if i == len(track_listing) - 1 else track_listing[i + 1]['start_time']
+        
+        # Find all jokes that fall within this track's time range
+        track_jokes = [joke for joke in joke_segments 
+                       if joke['start_time'] >= current_start and joke['start_time'] < current_end]
+        
+        if track_jokes:
+            bits.append({
+                "title": track['title'],
+                "start_time": current_start,
+                "end_time": track_jokes[-1]['end_time'] if track_jokes else current_end,
+                "jokes": track_jokes,
+                "bit_text": " ".join([joke['joke_text'] for joke in track_jokes]),
+                "laughter_count": sum(1 for joke in track_jokes if joke.get('laughter')),
+                "total_laughter_duration": sum(joke['laughter']['duration'] for joke in track_jokes if joke.get('laughter'))
+            })
+    
+    return bits
+
+def process_all_files():
+    """Process all JSON files with corresponding tracklists."""
+    json_files = glob.glob(os.path.join(JSON_OUTPUTS_FOLDER, "*.json"))
+    
+    if not json_files:
+        print(f"No JSON files found in {JSON_OUTPUTS_FOLDER}")
+        return
+    
+    for json_file in json_files:
+        base_name = os.path.basename(json_file).split('.')[0]
+        tracklist_file = os.path.join(TRACKLISTS_FOLDER, f"{base_name}_tracklist.json")
+        
+        if not os.path.exists(tracklist_file):
+            print(f"No tracklist found for {json_file}")
+            continue
+        
+        print(f"Processing {json_file} with tracklist {tracklist_file}")
+        
+        try:
+            bits = segment_by_track_listing(json_file, tracklist_file)
+            
+            if bits:
+                # Save the results
+                output_file = os.path.join(BITS_FOLDER, f"{base_name}_bits.json")
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(bits, f, indent=4)
+                
+                print(f"Saved {len(bits)} bits to {output_file}")
+                
+                # Print a summary
+                print(f"Bit summary for {base_name}:")
+                for bit in bits:
+                    print(f"  - {bit['title']}: {bit['laughter_count']} laughs, {bit['total_laughter_duration']:.2f}s total laughter")
+        
+        except Exception as e:
+            print(f"Error processing {json_file}: {e}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Segment comedy specials into bits based on tracklists")
+    parser.add_argument("--create-templates", action="store_true", help="Create empty tracklist templates")
+    parser.add_argument("--process", action="store_true", help="Process all files with tracklists")
+    
+    args = parser.parse_args()
+    
+    # Create folders
+    create_folders()
+    
+    if args.create_templates:
+        create_tracklist_templates()
+    
+    if args.process:
+        process_all_files()
+    
+    if not args.create_templates and not args.process:
+        print("Please specify an action: --create-templates or --process")
+        parser.print_help()
+
+if __name__ == "__main__":
+    main()
