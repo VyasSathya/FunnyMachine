@@ -1,3 +1,3 @@
 [submodule "llama-models"]
-    path = llama-models
-    url = https://github.com/yourusername/llama-models.git 
+	path = llama-models
+	url = https://github.com/VyasSathya/llama-comedy.git
