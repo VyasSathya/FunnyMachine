@@ -137,4 +137,68 @@ select optgroup { font-weight: bold; font-style: normal; color: var(--secondary-
 .error-message { background-color: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); padding: 10px 15px; border-radius: var(--border-radius); margin-top: 15px; font-size: 0.9em; cursor: pointer; }
 .tool-desc { padding: 30px; text-align: center; color: var(--secondary-color); font-style: italic; }
 
+/* Styling for BlockComponent Inline Editor */
+.inline-editor-container {
+  /* Add some padding or margin if needed */
+}
+
+.inline-editor-container label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.inline-edit-setup,
+.inline-edit-punchline,
+.inline-edit-tags {
+  width: 100%; /* Make input fields take full width */
+  padding: 8px;
+  margin-bottom: 10px; /* Add consistent spacing */
+  border: 1px solid #ccc; /* Standard border */
+  border-radius: 4px;
+  box-sizing: border-box; /* Include padding/border in width */
+  font-size: 0.95em;
+}
+
+.inline-edit-tags {
+  margin-bottom: 15px; /* More space before buttons */
+}
+
+.inline-editor-actions {
+  /* Styles for the button container if needed */
+}
+
+/* Optional: Style buttons within inline editor to match others */
+.inline-editor-actions .btn-small {
+  padding: 5px 10px;
+  font-size: 0.85em;
+}
+
+/* --- END BlockComponent Inline Editor --- */
+
+/* Styling for BlockComponent Suggestion Actions */
+.suggestion-block .suggestion-details {
+  padding-top: 5px; /* Add a bit of space above suggestion text */
+}
+
+.suggestion-actions {
+  display: flex; /* Use flexbox for alignment */
+  justify-content: flex-end; /* Align buttons to the right */
+  align-items: center; /* Align buttons vertically */
+  gap: 6px; /* Add space between buttons */
+  margin-top: 12px !important; /* Ensure consistent spacing, override inline style */
+  padding-top: 8px; /* Add space above buttons */
+  border-top: 1px solid #e2e8f0; /* Add a subtle separator */
+}
+
+/* Remove inline margin-right from buttons if possible, or override */
+.suggestion-actions .btn-small {
+  margin-right: 0 !important; /* Override inline style */
+  padding: 4px 8px; /* Slightly smaller padding */
+  font-size: 0.8em;
+}
+
+/* --- END BlockComponent Suggestion Actions --- */
+
 /* --- End of App.css --- */

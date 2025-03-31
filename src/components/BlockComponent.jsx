@@ -109,21 +109,37 @@ const BlockComponent = ({
             {/* Content */}
             <div className="block-content" style={{ backgroundColor: backgroundColor, border: isEditing ? '1px dashed #007bff' : 'none', padding: isEditing ? '15px' : '8px 10px' }} draggable={isDraggable} onDragStart={handleDragStartInternal}>
                {isEditing ? (
-                   // --- INLINE EDITOR VIEW ---
-                   <div className="inline-editor">
+                   // --- INLINE EDITING VIEW (for Jokes and Suggestions) ---
+                   <div className="inline-editor-container">
+                       <h5 style={{marginTop: 0, marginBottom: '10px'}}>{isSuggestion ? 'Edit Suggestion' : 'Edit Joke'}</h5>
                        <div style={{ marginBottom: '10px' }}>
                            <label>Setup:</label>
-                           <textarea value={editSetup} onChange={(e) => setEditSetup(e.target.value)} rows={3} style={{width: '100%'}} />
+                           <textarea 
+                               value={editSetup} 
+                               onChange={(e) => setEditSetup(e.target.value)} 
+                               rows={3} 
+                               className="inline-edit-setup"
+                           />
                        </div>
                        <div style={{ marginBottom: '10px' }}>
                            <label>Punchline:</label>
-                           <textarea value={editPunchline} onChange={(e) => setEditPunchline(e.target.value)} rows={3} style={{width: '100%'}} />
+                           <textarea 
+                               value={editPunchline} 
+                               onChange={(e) => setEditPunchline(e.target.value)} 
+                               rows={3} 
+                               className="inline-edit-punchline"
+                           />
                        </div>
                        <div style={{ marginBottom: '10px' }}>
                            <label>Tags (comma-separated):</label>
-                           <input type="text" value={editTagsInput} onChange={(e) => setEditTagsInput(e.target.value)} style={{width: '100%'}} />
+                           <input 
+                               type="text" 
+                               value={editTagsInput} 
+                               onChange={(e) => setEditTagsInput(e.target.value)} 
+                               className="inline-edit-tags"
+                            />
                        </div>
-                       <div style={{ textAlign: 'right' }}>
+                       <div className="inline-editor-actions" style={{ textAlign: 'right' }}>
                            <button className="btn btn-small" onClick={handleCancelEdit} style={{marginRight: '5px'}}>Cancel</button>
                            <button className="btn btn-small green-btn" onClick={handleSaveEdit}>Save {isSuggestion ? '& Approve' : 'Changes'}</button>
                        </div>

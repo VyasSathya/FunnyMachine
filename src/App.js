@@ -383,41 +383,144 @@ export default function App() {
     setTextSuggestions(null);
   }, [setLastError, setJokeBuilderData, setTextSuggestions]);
   
-  // --- Moved UP: Handler to save NEW joke ---
+  // --- Moved UP: Handler to save NEW joke (or merge into existing) ---
   const handleSaveJokeFromBuilder = useCallback((newJokePayload) => {
     const now = newJokePayload.timestamp || new Date().toISOString();
-    const initialText = `${newJokePayload.setup || ''}\n${newJokePayload.punchline || ''}`;
-    const firstVersion = {
-      id: `version-${now}-${Math.random().toString(16).slice(2)}`,
-      timestamp: now,
-      setup: newJokePayload.setup || '',
-      punchline: newJokePayload.punchline || '',
-      tags: newJokePayload.tags || [],
-      source_selection: newJokePayload.source_selection
-    };
-    const finalJoke = {
-      id: `joke-${now}-${Math.random().toString(16).slice(2)}`,
-      type: 'joke',
-      label: `Joke (${(newJokePayload.setup || newJokePayload.punchline).substring(0, 15)}...)`,
-      text: initialText, 
-      canonicalText: initialText, 
-      analysis: { structure: { setup: newJokePayload.setup || '', punchline: newJokePayload.punchline || '' } },
-      tags: newJokePayload.tags || [],
-      metadata: { creation_date: now, last_modified: now, is_starred: false },
-      versions: [firstVersion]
-    };
-    console.log("Saving new joke:", finalJoke);
-    setLibrary(currentLibrary => {
-        if (currentLibrary.some(item => item.id === finalJoke.id)) {
-            console.warn(`Joke with ID ${finalJoke.id} already exists.`);
-            return currentLibrary;
+    const setup = newJokePayload.setup || '';
+    const punchline = newJokePayload.punchline || '';
+    const tags = newJokePayload.tags || [];
+    const sourceSelection = newJokePayload.source_selection;
+
+    const proposedText = `${setup}\n${punchline}`;
+    const trimmedLowerProposedText = proposedText.trim().toLowerCase();
+
+    // --- Similarity Check (using Canonical Text) --- 
+    let existingJokeMatch = null;
+    library.forEach(item => {
+      if (item.type === 'joke' && item.canonicalText) {
+        const trimmedLowerCanonical = item.canonicalText.trim().toLowerCase();
+        if (trimmedLowerCanonical === trimmedLowerProposedText) {
+          existingJokeMatch = item; // Found a canonical match
         }
-        return [...currentLibrary, finalJoke];
+      }
     });
-    setLastError(`Joke "${finalJoke.label}" saved successfully!`);
-    setActiveLibCategory('joke');
-    setTimeout(() => setLastError(""), 4000);
-  }, [setLibrary, setLastError, setActiveLibCategory]); 
+
+    // --- Logic based on Match --- 
+    if (existingJokeMatch) {
+      console.log(`Canonical Match Found: Suggestion text matches canonical of existing joke ID: ${existingJokeMatch.id}`);
+      
+      setLibrary(currentLibrary => {
+        const jokeIndex = currentLibrary.findIndex(item => item.id === existingJokeMatch.id);
+        if (jokeIndex === -1) {
+            console.error("Consistency Error: Matched joke not found in library state during update.");
+            setLastError('Error: Could not update matched joke.');
+            return currentLibrary; // Should not happen
+        }
+
+        const updatedLibrary = [...currentLibrary];
+        const jokeToUpdate = structuredClone(updatedLibrary[jokeIndex]);
+        const versions = jokeToUpdate.versions || [];
+        let versionUpdated = false;
+
+        // Check if an identical version already exists
+        const existingVersionIndex = versions.findIndex(v => 
+            (v.setup || '') === setup && 
+            (v.punchline || '') === punchline
+        );
+
+        if (existingVersionIndex !== -1) {
+            // Exact version text match found - update usageDates
+            console.log(`Exact version text match found at index ${existingVersionIndex}. Updating usage dates.`);
+            const updatedVersion = versions[existingVersionIndex];
+            if (!Array.isArray(updatedVersion.usageDates)) {
+                updatedVersion.usageDates = [];
+            }
+            // Only add date if not already present for this exact timestamp (unlikely but safe)
+            if (!updatedVersion.usageDates.includes(now)) {
+                 updatedVersion.usageDates.push(now);
+                 updatedVersion.usageDates.sort((a, b) => new Date(b) - new Date(a)); // Keep sorted newest first
+            }
+            versions[existingVersionIndex] = updatedVersion;
+            versionUpdated = true;
+            setLastError(`Existing joke version updated with new usage date.`);
+
+        } else {
+            // No exact version match - create and add a new version
+            console.log("No exact version text match found. Creating new version.");
+            const newVersion = {
+                id: `version-${now}-${Math.random().toString(16).slice(2)}`,
+                timestamp: now,
+                setup: setup,
+                punchline: punchline,
+                tags: tags,
+                source_selection: sourceSelection, // Include source if available
+                usageDates: [now] // Initialize usage dates
+            };
+            // Add to beginning (or end)
+            versions.unshift(newVersion);
+            versionUpdated = true;
+            setLastError(`New version added to existing joke "${jokeToUpdate.label}".`);
+        }
+
+        // Update joke metadata and versions array
+        jokeToUpdate.versions = versions;
+        jokeToUpdate.metadata = {
+            ...jokeToUpdate.metadata,
+            last_modified: now
+        };
+
+        // Update the joke in the library
+        updatedLibrary[jokeIndex] = jokeToUpdate;
+        
+        // Also update focus item if it's the one modified
+        setFocusItem(currentFocus => {
+            if (currentFocus && currentFocus.id === jokeToUpdate.id) {
+                return structuredClone(jokeToUpdate);
+            }
+            return currentFocus;
+        });
+        
+        return updatedLibrary;
+      });
+      setTimeout(() => setLastError(""), 4000);
+      return; // Stop here, handled the match
+
+    } else {
+      // --- No Canonical Match - Create New Joke ---
+      console.log("No canonical match found. Saving as new joke.");
+      const firstVersion = {
+        id: `version-${now}-${Math.random().toString(16).slice(2)}`,
+        timestamp: now,
+        setup: setup,
+        punchline: punchline,
+        tags: tags,
+        source_selection: sourceSelection,
+        usageDates: [now] // Add usageDates here too
+      };
+      const finalJoke = {
+        id: `joke-${now}-${Math.random().toString(16).slice(2)}`,
+        type: 'joke',
+        label: `Joke (${(setup || punchline).substring(0, 15)}...)`,
+        text: proposedText, 
+        canonicalText: proposedText, // Set initial canonical text
+        analysis: { structure: { setup: setup, punchline: punchline } },
+        tags: tags,
+        metadata: { creation_date: now, last_modified: now, is_starred: false },
+        versions: [firstVersion]
+      };
+      console.log("Saving new joke:", finalJoke);
+      setLibrary(currentLibrary => {
+          if (currentLibrary.some(item => item.id === finalJoke.id)) {
+              console.warn(`Joke ID ${finalJoke.id} collision.`);
+              return currentLibrary;
+          }
+          return [...currentLibrary, finalJoke];
+      });
+      setLastError(`Joke "${finalJoke.label}" saved successfully!`);
+      setActiveLibCategory('joke');
+      setTimeout(() => setLastError(""), 4000);
+    }
+  }, [library, setLibrary, setFocusItem, setLastError, setActiveLibCategory]); // Added setFocusItem dependency
 
   // --- Handler to APPROVE a suggestion ---
   const handleApproveSuggestion = useCallback((suggestionData) => {
@@ -456,23 +559,72 @@ export default function App() {
 
   // Handler to UPDATE existing joke (from inline editor) 
   const handleUpdateItemInline = useCallback((updatedData) => {
-    const { jokeId } = updatedData;
+    const { jokeId, setup, punchline, tags } = updatedData;
     console.log(`App.js: Updating joke ID from inline editor: ${jokeId}`);
+    
+    let finalUpdatedJoke = null; // Variable to hold the updated joke data
+
     setLibrary(currentLibrary => {
-      // ... existing logic to find joke, create version, update library ...
       const jokeIndex = currentLibrary.findIndex(item => item.id === jokeId && item.type === 'joke');
-      if (jokeIndex === -1) { /* error */ return currentLibrary; }
+      if (jokeIndex === -1) { 
+        console.error(`Update Error: Joke with ID ${jokeId} not found.`);
+        setLastError('Failed to update: Joke not found.');
+        return currentLibrary; 
+      }
+
       const updatedLibrary = [...currentLibrary];
       const originalJoke = updatedLibrary[jokeIndex];
-      const now = updatedData.timestamp || new Date().toISOString();
-      const newVersion = { /* ... */ };
-      const updatedJoke = { /* ... */ };
+      const now = new Date().toISOString();
+
+      // --- Create the new version --- 
+      const newVersion = {
+        id: `version-${now}-${Math.random().toString(16).slice(2)}`,
+        timestamp: now, // Keep original creation timestamp for the edit event
+        setup: setup || '', // Use updated data
+        punchline: punchline || '', // Use updated data
+        tags: tags || [], // Use updated data
+        usageDates: [now] // Initialize usageDates with the creation time
+      };
+
+      // --- Create the updated joke object ---
+      const updatedJoke = {
+        ...originalJoke,
+        text: `${setup || ''}\n${punchline || ''}`,
+        analysis: { 
+          ...originalJoke.analysis,
+          structure: { setup: setup || '', punchline: punchline || '' }
+        },
+        tags: tags || [],
+        metadata: {
+          ...originalJoke.metadata,
+          last_modified: now,
+        },
+        versions: [newVersion, ...(originalJoke.versions || [])]
+      };
+
+      // Store the result for focus update
+      finalUpdatedJoke = updatedJoke; 
+
       updatedLibrary[jokeIndex] = updatedJoke;
       return updatedLibrary;
     });
+
+    // Update focusItem AFTER library state update is processed
+    // Use the 'finalUpdatedJoke' captured from the setLibrary update function
+    if (finalUpdatedJoke) {
+        setFocusItem(currentFocus => {
+            if (currentFocus && currentFocus.id === jokeId) {
+                // Return a clone of the directly updated joke data
+                return structuredClone(finalUpdatedJoke); 
+            }
+            return currentFocus;
+        });
+    }
+
     setLastError(`Joke updated successfully!`);
     setTimeout(() => setLastError(""), 4000);
-  }, [setLibrary, setLastError]);
+  // Dependencies remain the same, 'library' is no longer needed here for the focus update logic
+  }, [setLibrary, setFocusItem, setLastError]); 
 
   // Handler to set the canonical text for a joke 
   const handleSetCanonicalText = useCallback((jokeId, versionText, versionTimestamp) => {
