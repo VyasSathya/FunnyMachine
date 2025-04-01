@@ -55,27 +55,34 @@ interface ApiLibraryItem {
 
 /**
  * Fetches the entire nested library structure for a given user.
- * @param userId - The UUID of the user.
+ * @param userId - The UUID of the user, or null to fetch all data (for unauthenticated use).
  * @returns A promise that resolves to an array of top-level LibraryItems.
  */
-export const getLibraryTree = async (userId: string): Promise<ApiLibraryItem[]> => {
-  console.log(`Fetching library tree for user: ${userId}`);
+export const getLibraryTree = async (userId: string | null): Promise<ApiLibraryItem[]> => {
+  console.log(`Fetching library tree for user: ${userId || 'ALL'}`);
   
+  const userFilterClause = userId ? 'WHERE user_id = $1 AND is_archived = FALSE' : 'WHERE is_archived = FALSE';
+  const userParams = userId ? [userId] : [];
+
+  const userJoinClause = userId ? 'AND s.user_id = $1' : '';
+  const userJoinParams = userId ? [userId] : [];
+
   try {
-    // 1. Fetch all items for the user in parallel
+    // 1. Fetch all items (filtered by user if provided)
     const [specialsRes, setsRes, bitsRes, jokesRes] = await Promise.all([
-      query('SELECT id, label, metadata, user_id, created_at, updated_at FROM specials WHERE user_id = $1 AND is_archived = FALSE', [userId]),
-      query('SELECT id, label, metadata, user_id, created_at, updated_at FROM sets WHERE user_id = $1 AND is_archived = FALSE', [userId]),
-      query('SELECT id, label, metadata, user_id, created_at, updated_at FROM bits WHERE user_id = $1 AND is_archived = FALSE', [userId]),
-      query('SELECT id, metadata, user_id, created_at, updated_at FROM jokes WHERE user_id = $1 AND is_archived = FALSE', [userId]), // Adjust selected joke fields as needed
+      query(`SELECT id, label, metadata, user_id, created_at, updated_at FROM specials ${userFilterClause}`, userParams),
+      query(`SELECT id, label, metadata, user_id, created_at, updated_at FROM sets ${userFilterClause}`, userParams),
+      query(`SELECT id, label, metadata, user_id, created_at, updated_at FROM bits ${userFilterClause}`, userParams),
+      query(`SELECT id, metadata, user_id, created_at, updated_at FROM jokes ${userFilterClause}`, userParams), // Adjust selected joke fields as needed
       // Add query for DbIdea if needed
     ]);
 
-    // 2. Fetch all relationships
+    // 2. Fetch all relationships (filtered by user if provided)
+    // NOTE: These joins implicitly filter by user IF userId is provided, otherwise they fetch all.
     const [specialSetsRes, setBitsRes, bitJokesRes] = await Promise.all([
-       query('SELECT ss.special_id, ss.set_id, ss.order_index FROM special_sets ss JOIN specials s ON ss.special_id = s.id WHERE s.user_id = $1', [userId]),
-       query('SELECT sb.set_id, sb.bit_id, sb.order_index FROM set_bits sb JOIN sets s ON sb.set_id = s.id WHERE s.user_id = $1', [userId]),
-       query('SELECT bj.bit_id, bj.joke_id, bj.order_index FROM bit_jokes bj JOIN bits b ON bj.bit_id = b.id WHERE b.user_id = $1', [userId]),
+       query(`SELECT ss.special_id, ss.set_id, ss.order_index FROM special_sets ss JOIN specials s ON ss.special_id = s.id WHERE s.is_archived = FALSE ${userJoinClause}`, userJoinParams),
+       query(`SELECT sb.set_id, sb.bit_id, sb.order_index FROM set_bits sb JOIN sets s ON sb.set_id = s.id WHERE s.is_archived = FALSE ${userJoinClause}`, userJoinParams),
+       query(`SELECT bj.bit_id, bj.joke_id, bj.order_index FROM bit_jokes bj JOIN bits b ON bj.bit_id = b.id WHERE b.is_archived = FALSE ${userJoinClause}`, userJoinParams),
     ]);
 
     // 3. Combine and structure items (with explicit label for jokes)

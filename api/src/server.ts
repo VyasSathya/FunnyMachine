@@ -66,7 +66,7 @@ app.use(`${apiPrefix}/jokes`, auth, cache(defaultCacheOptions), jokeRoutes);
 app.use(`${apiPrefix}/bits`, auth, cache(defaultCacheOptions), bitRoutes);
 
 // Library structure route (read-only, might not need cache?)
-app.use(`${apiPrefix}/library`, [auth, libraryRoutes]);
+app.use(`${apiPrefix}/library`, [/*auth,*/ libraryRoutes]);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

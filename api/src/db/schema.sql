@@ -101,26 +101,31 @@ END;
 $$ language 'plpgsql';
 
 -- Create triggers for updated_at
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_bits_updated_at ON bits;
 CREATE TRIGGER update_bits_updated_at
     BEFORE UPDATE ON bits
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_jokes_updated_at ON jokes;
 CREATE TRIGGER update_jokes_updated_at
     BEFORE UPDATE ON jokes
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_sets_updated_at ON sets;
 CREATE TRIGGER update_sets_updated_at
     BEFORE UPDATE ON sets
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_specials_updated_at ON specials;
 CREATE TRIGGER update_specials_updated_at
     BEFORE UPDATE ON specials
     FOR EACH ROW
@@ -137,21 +142,25 @@ END;
 $$ language 'plpgsql';
 
 -- Create triggers for soft deletes
+DROP TRIGGER IF EXISTS soft_delete_bits ON bits;
 CREATE TRIGGER soft_delete_bits
     BEFORE DELETE ON bits
     FOR EACH ROW
     EXECUTE FUNCTION soft_delete();
 
+DROP TRIGGER IF EXISTS soft_delete_jokes ON jokes;
 CREATE TRIGGER soft_delete_jokes
     BEFORE DELETE ON jokes
     FOR EACH ROW
     EXECUTE FUNCTION soft_delete();
 
+DROP TRIGGER IF EXISTS soft_delete_sets ON sets;
 CREATE TRIGGER soft_delete_sets
     BEFORE DELETE ON sets
     FOR EACH ROW
     EXECUTE FUNCTION soft_delete();
 
+DROP TRIGGER IF EXISTS soft_delete_specials ON specials;
 CREATE TRIGGER soft_delete_specials
     BEFORE DELETE ON specials
     FOR EACH ROW

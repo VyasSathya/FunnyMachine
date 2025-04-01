@@ -30,6 +30,8 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
 .env.local
 .env.development.local
 .env.test.local
@@ -37,11 +39,23 @@ yarn-error.log*
 
 # IDEs and editors
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
 *.swp
 *.swo
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
 
 # Project specific
 uploads/
@@ -80,4 +94,49 @@ mobile-app/web-build/
 mobile-app/.expo-shared/
 
 # Keep .gitignore files
-!.gitignore 
+!.gitignore
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Sensitive Info (if storing config in repo, use .gitignore)
+# config/local.json
+# secrets/*
+# *.pem
+
+# Large media files (add specific paths/patterns if needed)
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.mp3
+*.wav
+*.ogg
+*.aac
+*.flac
+*.npz 
