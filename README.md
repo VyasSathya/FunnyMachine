@@ -1,71 +1,78 @@
 # FunnyMachine
 
-A comprehensive comedy analysis and processing system that combines various tools and models for analyzing comedy specials and generating insights.
+A comprehensive comedy analysis and generation system.
 
 ## Project Structure
 
-- `comedy-construction-engine/`: Main application server and services
-- `specials/`: Processing pipeline for comedy specials
-- `llama-models/`: LLM models and training data (submodule)
-- `mobile-app/`: Mobile application for comedy analysis
-- `config/`: Configuration files
-- `scripts/`: Processing and utility scripts
-
-## Components
-
-### Backend
-- Server implementation in Node.js
-- Python processing scripts
-- Llama model integration
-- Comedy specials analysis pipeline
-
-### Mobile App
-- Native mobile application
-- Real-time comedy analysis
-- Integration with backend services
-- User interface for comedy insights
+```
+FunnyMachine/
+├── core_app/              # Main application code
+│   ├── comedy_detector.py
+│   ├── optimized-detector.py
+│   └── test_detector.py
+├── specials/             # Comedy specials processing
+│   ├── server.js
+│   ├── process_and_analyze.py
+│   └── process_remaining_specials.py
+├── llama/               # Llama integration
+├── data/               # All data directories
+│   ├── mp3_files/
+│   ├── mp4_files/
+│   ├── segmented_bits/
+│   ├── tracklists/
+│   ├── processed_data/
+│   └── training_data/
+├── utils/              # Shared utilities
+│   ├── setup-script.py
+│   └── bit-segmenter.py
+└── config/            # Configuration files
+    ├── .env
+    └── guidelines/
+```
 
 ## Setup
 
-1. Clone the repository:
+1. Install dependencies:
 ```bash
-git clone [your-repo-url]
-cd FunnyMachine
-git submodule update --init --recursive
-```
-
-2. Install dependencies:
-```bash
-# Python dependencies
-pip install -r requirements.txt
-
-# Node.js dependencies
 npm install
-
-# Mobile app dependencies
-cd mobile-app
-npm install  # or yarn install
+pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
-- Copy `.env.example` to `.env`
-- Update the variables as needed
+2. Configure environment variables in `config/.env`:
+```
+API_ENDPOINT=http://localhost:4321/api/analyze-jokes-batch
+MODEL_TO_USE=gpt-4
+```
+
+3. Start the server:
+```bash
+node specials/server.js
+```
+
+4. Process comedy specials:
+```bash
+python specials/process_and_analyze.py
+```
+
+## Components
+
+- **Core App**: Main comedy detection and analysis engine
+- **Specials**: Processing and analysis of comedy specials
+- **Llama**: Integration with Llama for advanced language processing
+- **Utils**: Shared utilities and helper functions
+- **Data**: All data files and processed outputs
+- **Config**: Configuration files and environment settings
 
 ## Development
 
-### Backend Development
-- Python scripts are in the `scripts/` directory
-- Main server code is in `comedy-construction-engine/`
-- Processing scripts for specials are in `specials/`
+1. Open the project in Cursor
+2. Set up your environment variables
+3. Start the server
+4. Run the processing scripts
 
-### Mobile App Development
-- Mobile app code is in `mobile-app/`
-- Follow the mobile app's README for specific setup instructions
+## Notes
 
-## License
-
-[Your chosen license]
-
-## Contributing
-
-See CONTRIBUTING.md for guidelines. 
+- The server runs on port 4321 by default
+- All processed data is saved in `data/processed_data/`
+- Training data is stored in `data/training_data/`
+- Configuration files are in `config/` 

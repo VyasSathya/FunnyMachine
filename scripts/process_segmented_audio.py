@@ -29,7 +29,8 @@ def process_segmented_audio(special_name, audio_dir):
         })
     
     # Save tracklist
-    tracklist_dir = "tracklists"
+    # tracklist_dir = "tracklists" # Old path relative to execution dir
+    tracklist_dir = "data/raw/tracklists" # Updated path relative to project root
     os.makedirs(tracklist_dir, exist_ok=True)
     tracklist_file = os.path.join(tracklist_dir, f"{special_name}_tracklist.json")
     
@@ -42,18 +43,23 @@ def process_segmented_audio(special_name, audio_dir):
     for audio_file in audio_files:
         print(f"Processing {audio_file}...")
         # Run the detector on each segment
-        os.system(f"python comedy_detector.py {audio_file}")
+        # TODO: Update path if comedy_detector.py is not in the root/PATH. File seems missing.
+        os.system(f"python src/core_app/optimized-detector.py {audio_file}")
 
 def main():
     # Process Hannibal special
-    hannibal_dir = "mp3_files"
+    # TODO: Ensure this input directory path is correct relative to project root
+    # hannibal_dir = "mp3_files" 
+    hannibal_dir = "data/raw/mp3_files" # Updated path based on search
     process_segmented_audio("hannibal", hannibal_dir)
     
     # After processing, run the bit segmenter
-    os.system("python bit-segmenter.py --process")
+    # TODO: Update path if bit-segmenter.py is not in the root/PATH. File seems missing.
+    os.system("python analysis_engine/comedy_analyzer.py --process")
     
-    # Finally, run the analysis
-    os.system("python process_and_analyze.py")
+    # Finally, run the analysis script (located in the same 'scripts' directory)
+    # Assumes this script (process_segmented_audio.py) is run from the project root
+    os.system("python scripts/process_and_analyze.py")
 
 if __name__ == "__main__":
     main() 

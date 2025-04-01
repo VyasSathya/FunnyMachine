@@ -1,24 +1,18 @@
 {
-  "name": "funnymachine-root",
+  "name": "comedy-analysis-server",
   "version": "1.0.0",
-  "private": true,
-  "description": "Root workspace for FunnyMachine project",
+  "description": "Server for analyzing comedy specials",
+  "main": "server.js",
   "scripts": {
-    "// api scripts": "",
-    "api:dev": "cd api && npm run dev",
-    "api:start": "cd api && npm start",
-    "api:build": "cd api && npm run build",
-    "api:test": "cd api && npm test",
-    "api:db:setup": "cd api && npm run db:setup",
-    "// frontend scripts": "",
-    "frontend:start": "cd comedy-construction-engine && npm start",
-    "frontend:build": "cd comedy-construction-engine && npm run build",
-    "frontend:test": "cd comedy-construction-engine && npm test",
-    "// comedy engine server scripts": "",
-    "comedy-engine:start": "cd comedy-construction-engine && npm run start-server"
+    "start": "node server.js"
   },
-  "workspaces": [
-    "api",
-    "comedy-construction-engine"
-  ]
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@google/generative-ai": "^0.24.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "openai": "^4.28.0",
+    "uuid": "^11.1.0"
+  }
 }

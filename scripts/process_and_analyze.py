@@ -8,8 +8,10 @@ import requests # For making HTTP requests (pip install requests)
 import time
 
 # --- Configuration ---
-SEGMENTED_BITS_DIR = 'segmented_bits/'  # Input folder with *_bits.json files
-OUTPUT_DIR = 'processed_data/'  # Output directory
+# SEGMENTED_BITS_DIR = 'segmented_bits/'  # Input folder with *_bits.json files (Old path)
+SEGMENTED_BITS_DIR = 'data/interim/segmented_bits/' # Updated input path relative to project root
+# OUTPUT_DIR = 'processed_data/'  # Output directory (Old path)
+OUTPUT_DIR = 'data/processed/'  # Updated output directory relative to project root
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'jokes_with_ai_analysis.jsonl') # Output file
 API_ENDPOINT = "http://localhost:4321/api/analyze-jokes-batch" # Your running Node.js server URL
 BATCH_SIZE = 10 # Adjust based on typical joke length and API limits
