@@ -1,0 +1,39 @@
+name: Misdirection
+simple_definition: "Making people think you're going one way, then surprising them by going another way"
+
+detailed_definition: >
+  A comedy technique where the setup deliberately leads the audience 
+  to expect one outcome, but the punchline subverts this expectation 
+  in a surprising but logically connected way.
+
+key_characteristics:
+  - name: "Clear Expected Direction"
+    description: "Setup must establish a clear path that audience will assume"
+    
+  - name: "Subverted Expectation"
+    description: "Punchline must go in different direction than setup suggested"
+    
+  - name: "Logical Connection"
+    description: "The surprise must make sense in retrospect"
+
+common_patterns:
+  setup:
+    - "You know how..."
+    - "Everyone thinks..."
+    - "The thing about..."
+    - "I'm not saying..."
+  
+  punchline:
+    - "But actually..."
+    - "Turns out..."
+    - "The real problem is..."
+
+effectiveness_factors:
+  - "Clarity of initial expectation"
+  - "Degree of surprise in subversion"
+  - "Strength of logical connection"
+  - "Timing of revelation"
+
+difficulty_level: 3  # Scale of 1-5
+requires_setup: true
+typical_laugh_delay: "0.5-1.5 seconds"  # Time for audience to process 

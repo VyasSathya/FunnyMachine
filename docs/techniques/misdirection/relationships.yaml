@@ -1,0 +1,79 @@
+name: Misdirection
+related_techniques:
+  enhances:
+    - technique: "Callback"
+      strength: 0.8
+      description: "Misdirection can make callbacks more surprising"
+      example: >
+        Setup references earlier joke seemingly straight,
+        then misdirects to new punchline
+    
+    - technique: "Act Out"
+      strength: 0.7
+      description: "Physical misdirection can enhance verbal misdirection"
+      example: >
+        Body language suggests one direction while
+        punchline goes another
+  
+  enhanced_by:
+    - technique: "Timing"
+      strength: 0.9
+      description: "Proper pause before misdirection increases impact"
+      notes: "Optimal pause length: 0.5-1.5 seconds"
+    
+    - technique: "Setup Building"
+      strength: 0.8
+      description: "Strong setup makes misdirection more effective"
+      notes: "Clearer expectation = stronger surprise"
+
+  conflicts_with:
+    - technique: "Anti-humor"
+      severity: 0.6
+      description: "Anti-humor often removes logical connection"
+      resolution: "Choose one approach or clearly separate"
+    
+    - technique: "One-liners"
+      severity: 0.4
+      description: "One-liners often too brief for proper misdirection"
+      resolution: "Can work if setup is very efficient"
+
+  common_combinations:
+    - name: "Misdirection + Callback + Act Out"
+      effectiveness: 0.9
+      example: >
+        Reference earlier joke, act out expected direction,
+        then verbally misdirect to new punchline
+    
+    - name: "Misdirection + Character Work"
+      effectiveness: 0.8
+      example: >
+        Establish character expectation, then break
+        character in surprising but logical way
+
+sequence_effects:
+  before:
+    - technique: "Callback"
+      reason: "Provides material to call back to"
+    
+    - technique: "Character Break"
+      reason: "Establishes character to subvert"
+  
+  after:
+    - technique: "Tag"
+      reason: "Can build on misdirection's surprise"
+    
+    - technique: "Act Out"
+      reason: "Can physically emphasize the twist"
+
+training_progression:
+  1: "Simple verbal misdirection"
+  2: "Adding physical elements"
+  3: "Combining with callbacks"
+  4: "Complex multi-level misdirection"
+  5: "Integrating with character work"
+
+notes:
+  - "Start with clear, simple misdirection before attempting combinations"
+  - "Always maintain logical connection even in complex combinations"
+  - "Use related techniques to enhance but not overshadow misdirection"
+  - "Consider audience's cognitive load when combining techniques" 
