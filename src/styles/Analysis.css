@@ -1,0 +1,135 @@
+/* Analysis Styles */
+
+.text-analysis {
+    padding: 15px;
+  }
+  
+  .analyzing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #718096;
+    font-style: italic;
+  }
+  
+  .empty-analysis {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #718096;
+  }
+  
+  .color-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+  
+  .color-box {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    border-radius: 3px;
+  }
+  
+  .color-box.unnecessary {
+    background-color: #fc8181; /* Red */
+  }
+  
+  .color-box.acceptable-setup {
+    background-color: #90cdf4; /* Light Blue */
+  }
+  
+  .color-box.strong-setup {
+    background-color: #3182ce; /* Dark Blue */
+  }
+  
+  .color-box.acceptable-punchline {
+    background-color: #9ae6b4; /* Light Green */
+  }
+  
+  .color-box.strong-punchline {
+    background-color: #38a169; /* Dark Green */
+  }
+  
+  .analyzed-text {
+    padding: 15px;
+    line-height: 1.8;
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    min-height: 100px;
+  }
+  
+  .word {
+    display: inline;
+    padding: 2px 0;
+    border-radius: 3px;
+    cursor: default;
+    transition: background-color 0.3s ease;
+  }
+  
+  .word.unnecessary {
+    background-color: #fc8181; /* Red */
+    color: #fff;
+  }
+  
+  .word.acceptable-setup {
+    background-color: #90cdf4; /* Light Blue */
+  }
+  
+  .word.strong-setup {
+    background-color: #3182ce; /* Dark Blue */
+    color: #fff;
+  }
+  
+  .word.acceptable-punchline {
+    background-color: #9ae6b4; /* Light Green */
+  }
+  
+  .word.strong-punchline {
+    background-color: #38a169; /* Dark Green */
+    color: #fff;
+  }
+  
+  .analysis-summary {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 15px;
+  }
+  
+  .analysis-summary h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1rem;
+  }
+  
+  .metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .metric {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+  }
